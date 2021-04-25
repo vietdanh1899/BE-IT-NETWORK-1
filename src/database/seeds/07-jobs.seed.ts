@@ -69,12 +69,6 @@ export default class JobsSeeder implements Seeder {
       const splitAddress = _.split(jobsData[index].address, ',');
 
       const city = this.getSlug(_.last(splitAddress));
-      const results = await axios.get(`${process.env.GEO_API_URL}`, {
-        params: {
-          address: jobsData[index].address,
-          key: `${process.env.GEO_API_KEY}`,
-        },
-      });
 
       // for (let track = 0; track < provinces.data.results.length; track++) {
       //   const splitProvince = _.split(
