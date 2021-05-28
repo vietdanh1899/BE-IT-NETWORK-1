@@ -20,6 +20,7 @@ import { User } from './user.entity';
 import { ProfileSkill } from './ProfileSkill.entity';
 import { EducationProfile } from './EducationProfile.entity';
 import { Experience } from './experience.entity';
+import { CV } from './cv.entity';
 const { CREATE, UPDATE } = CrudValidationGroups;
 
 @Entity('profiles')
@@ -104,4 +105,7 @@ export class Profile extends Base {
     },
   )
   experiences: Experience[];
+
+  @OneToMany(() => CV, cv => cv.profile)
+  cvs: CV[];
 }

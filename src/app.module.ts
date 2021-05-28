@@ -27,6 +27,7 @@ import { SkillModule } from './App/skill/skill.module';
 import { EducationModule } from './App/education/education/education.module';
 import { ExperienceModule } from './App/experience/experience.module';
 import { NotificationsModule } from './App/notifications/notifications.module';
+import { ApplyController } from './apply/apply.controller';
 
 @Module({
   imports: [
@@ -52,7 +53,7 @@ import { NotificationsModule } from './App/notifications/notifications.module';
     }),
     ArticlesModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, ApplyController],
   providers: [
     {
       provide: APP_FILTER,

@@ -26,6 +26,7 @@ import { Category } from './category.entity';
 import { Address } from './address.entity';
 import { Exclude } from 'class-transformer';
 import { AppliedJob } from './applied_job.entity';
+import { JobToCv } from './jobtocv.entity';
 
 const { CREATE, UPDATE } = CrudValidationGroups;
 @Entity('jobs')
@@ -201,4 +202,7 @@ export class Job extends Base {
     },
   })
   recentlyUser: User[];
+
+  @OneToMany(() => JobToCv, jobToCv => jobToCv.job)
+  public jobToCvs!: JobToCv[];
 }
