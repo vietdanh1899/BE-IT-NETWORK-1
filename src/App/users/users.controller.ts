@@ -338,14 +338,14 @@ export class UserController extends BaseController<User> {
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-          user: 'tdnghia1011@gmail.com', // generated ethereal user
-          pass: 'btaaxlnkyzgdroma', // generated ethereal password
+          user: 'vietdanh.kiemtien.01@gmail.com', // generated ethereal user
+          pass: 'kiemtien01', // generated ethereal password
         },
       });
 
       // send mail with defined transport object
       const mailOptions = {
-        from: '"CareerNetwork" <tdnghia1011@gmail.com>', // sender address
+        from: '"CareerNetwork" <vietdanh.kiemtien.01@gmail.com>', // sender address
         to: user.email, // list of receivers
         subject: 'Thank you for joining the App CareerNetwork!', // Subject line
         text: 'I am so glad you registered for the CareerNetwork', // plain text body

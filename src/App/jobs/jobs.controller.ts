@@ -254,14 +254,14 @@ export class JobsController extends BaseController<Job> {
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-          user: 'tdnghia1011@gmail.com', // generated ethereal user
-          pass: 'btaaxlnkyzgdroma', // generated ethereal password
+          user: 'vietdanh.kiemtien.01@gmail.com', // generated ethereal user
+          pass: 'kiemtien01', // generated ethereal password
         },
       });
 
       // send mail with defined transport object
       const mailOptions = {
-        from: '"Career Network" <tdnghia1011@gmail.com>', // sender address
+        from: '"Career Network" <vietdanh.kiemtien.01@gmail.com>', // sender address
         to: acceptedUser.email, // list of receivers
         subject: 'Your CV has been reviewed and accepted by the recruitment', // Subject line
         text: `Congratulation, your CV has been accepted by the recruitment for ${job.name}. Contact them to get more details!`, // plain text body

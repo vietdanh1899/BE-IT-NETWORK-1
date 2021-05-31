@@ -1,12 +1,10 @@
 import { Body, ConflictException, Controller, Delete, Get, InternalServerErrorException, Param, Post } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { JobRepository } from 'src/App/jobs/jobs.repository';
+import { AppliedJob } from 'src/entity/applied_job.entity';
 import { CV } from 'src/entity/cv.entity';
 import { Job } from 'src/entity/job.entity';
 import { JobToCv } from 'src/entity/jobtocv.entity';
-import { Profile } from 'src/entity/profile.entity';
 import { User } from 'src/entity/user.entity';
-import { Any, Connection, getManager, getRepository, In } from 'typeorm';
+import { getManager, getRepository, In } from 'typeorm';
 
 @Controller('apply')
 export class ApplyController {
@@ -66,8 +64,11 @@ export class ApplyController {
             const appliedjob = await getRepository(JobToCv).findOne({where : {jobId: jobId, cvId: cvId}});
             if (appliedjob) throw new ConflictException('Job already applied');
             const jobToCv = new JobToCv();
-            jobToCv.job = await getRepository(Job).findOne(jobId);
-            jobToCv.cv = await getRepository(CV).findOne(cvId);
+            const job = await getRepository(Job).findOne(jobId);
+            const cv = await getRepository(CV).findOne(cvId, {relations: ["profile", "profile.user"]});
+            jobToCv.job = job;
+            jobToCv.cv = cv;
+            await getRepository(AppliedJob).insert({userId: cv.profile.user.id, jobId: job.id});
             return await this.manager.save(jobToCv);
         }
         catch (err) {
