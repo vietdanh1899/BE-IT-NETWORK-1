@@ -85,6 +85,7 @@ export class ApplyController {
         // return cvs;
         // console.log(cvs[0]);
         console.log(cvs.map((cv) => cv.id));
+        if (!cvs.length) return null;
         return await getRepository(JobToCv).find({cvId: In(cvs.map((cv) => cv.id))});
         // console.log(appliedJobs);
     }

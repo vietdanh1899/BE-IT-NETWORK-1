@@ -11,13 +11,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { Job } from 'src/entity/job.entity';
 import { JobRepository } from './jobs.repository';
-import { getManager } from 'typeorm';
+import { getManager, getRepository, In } from 'typeorm';
 import { UserRepository } from '../users/user.repository';
 import { CategoryRepository } from '../categories/categories.repository';
 import axios from 'axios';
 import { AddressRepository } from '../address/address.repository';
 import { AppliesJobRepo } from './jobApplies.repository';
 import * as _ from 'lodash';
+import { User } from 'src/entity/user.entity';
+import { JobToCv } from 'src/entity/jobtocv.entity';
 
 @Injectable()
 export class JobService extends TypeOrmCrudService<Job> {
@@ -280,12 +282,24 @@ export class JobService extends TypeOrmCrudService<Job> {
       );
     }
   }
-
   async getAllFavoriteJob() {
     const manager = getManager();
     return await manager.query(
-      `SELECT distinct("jobId") FROM ${this.tableName}`,
+      `SELECT distinct("jobId") FROM ${this.tableName}`
     );
+  }
+
+  async getAllFavoriteJobByUserId(userId: string) {
+    const manager = getManager();
+    return await manager.query(
+      `SELECT distinct("jobId") FROM ${this.tableName} WHERE "userId"='${userId}'`
+    );
+  }
+  async getAllAppliedJob(userId: string) {
+    const user: User = await getRepository(User).findOne(userId, {relations: ["profile", "profile.cvs"]});
+    const cvs = user.profile.cvs;
+    if (!cvs.length) return null;
+    else return await getRepository(JobToCv).find({cvId: In(cvs.map((cv) => cv.id))});
   }
 
   async updateRecently(userId: string, jobId: string) {

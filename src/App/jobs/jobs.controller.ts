@@ -31,7 +31,7 @@ import { ModuleEnum } from 'src/common/enums/module.enum';
 import { Job } from 'src/entity/job.entity';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { ValidationPipe } from 'src/shared/validation.pipe';
-import { getManager, IsNull, Not, Repository } from 'typeorm';
+import { getManager, getRepository, IsNull, Not, Repository } from 'typeorm';
 import { JobRepository } from './jobs.repository';
 import { JobService } from './jobs.service';
 import * as _ from 'lodash';
@@ -41,6 +41,17 @@ import { User } from 'src/entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GeoDTO } from './geo.dto';
 import { getDistance } from 'geolib';
+
+// @Controller('api/v2/jobs')
+// export class JobControllerV2 {
+//   @Get('/:jobId')
+//   async getJob(@Param('jobId') jobId: string) {
+//     console.log(jobId);
+//     const job = await getRepository(Job).findOne(jobId);
+//     console.log(job);
+//     return job;
+//   }
+// }
 
 @Crud({
   model: {
@@ -154,28 +165,36 @@ export class JobsController extends BaseController<Job> {
   }
 
   @Get('all')
-  async getAll() {
+  async getAll(@Body('userId') userId: string) {
     const allJob: any = await this.repository.find();
-    const currentDate = new Date().toLocaleDateString();
+    const currentDate = new Date();
     const checkJobDeadline = allJob.filter(job => {
       const parts = job.deadline.split('-');
       const jobDeadline = new Date(
         `${parts[1]}/${parts[2]}/${parts[0]}`,
-      ).toLocaleDateString();
-      return jobDeadline >= currentDate;
+      );
+      return jobDeadline.getTime() >= currentDate.getTime();
     });
-    const favorite = await this.service.getAllFavoriteJob();
-    const isFavorite = checkJobDeadline.map(job => {
-      console.log(_.find(favorite, { jobId: job.id }));
-      if (_.find(favorite, { jobId: job.id })) {
-        job.isFavorite = true;
-      } else {
-        job.isFavorite = false;
-      }
-
+    if (userId) {
+      const applied = await this.service.getAllAppliedJob(userId);
+      const favorite = await this.service.getAllFavoriteJobByUserId(userId);
+      const isFavorite = checkJobDeadline.map(job => {
+        // console.log(_.find(favorite, { jobId: job.id }));
+        if (_.find(favorite, { jobId: job.id })) {
+          job.isFavorite = true;
+        } else {
+          job.isFavorite = false;
+        }
+        job.isApplied = applied.some(_jobToCv => _jobToCv.jobId === job.id);
+        return job;
+      });
+      return isFavorite;
+    }
+    else return checkJobDeadline.map(job => {
+      job.isFavorite = false;
+      job.isApplied = false;
       return job;
     });
-    return isFavorite;
   }
 
   @Get('favorites')
@@ -520,4 +539,25 @@ export class JobsController extends BaseController<Job> {
   async getAllgetAcceptedUserByJobIdAcceptJob(@Param('id') id: string) {
     return this.service.getAcceptedUserByJobId(id);
   }
+
+  @Get('detail/:jobId')
+  async getJob(@Param('jobId') jobId: string, @Body('userId') userId:string) {
+    console.log(jobId);
+    const job: any = await getRepository(Job).findOne(jobId);
+    console.log(job);
+    if (!job) return null;
+    if (userId) {
+      const applied = await this.service.getAllAppliedJob(userId);
+      const favorite = await this.service.getAllFavoriteJobByUserId(userId);
+      console.log(favorite);
+      job.isApplied = applied.some(_jobToCv => _jobToCv.jobId === jobId);
+      job.isFavorite = favorite.some(_jobFavorite => _jobFavorite.jobId === jobId);
+    }
+    else {
+      job.isFavorite = false;
+      job.isApplied = false;
+    }
+    return job;
+  }
 }
+

@@ -8,7 +8,7 @@ export class JobToCv {
     public jobToCvId!: number;
 
     @Column()
-    public jobId!: number;
+    public jobId!: string;
 
     @Column()
     public cvId!: number;
