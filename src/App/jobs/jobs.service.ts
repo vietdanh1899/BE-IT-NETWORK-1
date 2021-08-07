@@ -20,6 +20,7 @@ import { AppliesJobRepo } from './jobApplies.repository';
 import * as _ from 'lodash';
 import { User } from 'src/entity/user.entity';
 import { JobToCv } from 'src/entity/jobtocv.entity';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class JobService extends TypeOrmCrudService<Job> {
@@ -290,6 +291,7 @@ export class JobService extends TypeOrmCrudService<Job> {
   }
 
   async getAllFavoriteJobByUserId(userId: string) {
+    if (!isUUID(userId)) return [];
     const manager = getManager();
     const jobFavorite = await manager.query(
       `SELECT distinct("jobId") FROM ${this.tableName} WHERE "userId"='${userId}'`
@@ -298,6 +300,7 @@ export class JobService extends TypeOrmCrudService<Job> {
     else return jobFavorite;
   }
   async getAllAppliedJob(userId: string) {
+    if (!isUUID(userId)) return [];
     const user: User = await getRepository(User).findOne(userId, {relations: ["profile", "profile.cvs"]});
     const cvs = user.profile.cvs;
     if (!cvs.length) return [];
