@@ -138,7 +138,7 @@ export class JobsController extends BaseController<Job> {
 
       if (response.count) {
         isFavorite = response.data.map(job => {
-          console.log('job', job);
+          // console.log('job', job);
 
           if (_.find(favorite, { jobId: job.id })) {
             job.isFavorite = true;
@@ -150,7 +150,7 @@ export class JobsController extends BaseController<Job> {
         return { ...response, data: isFavorite };
       } else {
         isFavorite = response.map(job => {
-          console.log(_.find(favorite, { jobId: job.id }));
+          // console.log(_.find(favorite, { jobId: job.id }));
           if (_.find(favorite, { jobId: job.id })) {
             job.isFavorite = true;
           } else {

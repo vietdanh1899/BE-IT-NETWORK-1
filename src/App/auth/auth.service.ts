@@ -65,7 +65,7 @@ export class AuthServices {
   async getProfile(id: string) {
     const user = await this.userRepository.find({
       where: { id },
-      relations: ['profile', 'profile.profileSkill', 'address'],
+      relations: ['profile', 'address'],
       select: [
         'email',
         'id',

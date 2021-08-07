@@ -416,7 +416,7 @@ export class UserController extends BaseController<User> {
     try {
       const user:any = await this.repository.find({
         where: { id },
-        relations: ['profile', 'profile.profileSkill', 'address', 'profile.educationProfile'],
+        relations: ['profile', 'address'],
         select: [
           'email',
           'id',

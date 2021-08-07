@@ -19,7 +19,7 @@ export class ApplyController {
     async getCv(@Param('userId') userId: string) {
         try {
             const user = await getRepository(User).findOne(userId, {relations: ["profile", "profile.cvs"]});
-            console.log(user);
+            // console.log(user);
             // const profile = await getRepository(Profile).findOne(user.profile, {relations: ["cvs"]});
             // console.log(profile);
             return user.profile.cvs;

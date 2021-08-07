@@ -291,14 +291,16 @@ export class JobService extends TypeOrmCrudService<Job> {
 
   async getAllFavoriteJobByUserId(userId: string) {
     const manager = getManager();
-    return await manager.query(
+    const jobFavorite = await manager.query(
       `SELECT distinct("jobId") FROM ${this.tableName} WHERE "userId"='${userId}'`
     );
+    if (!jobFavorite) return [];
+    else return jobFavorite;
   }
   async getAllAppliedJob(userId: string) {
     const user: User = await getRepository(User).findOne(userId, {relations: ["profile", "profile.cvs"]});
     const cvs = user.profile.cvs;
-    if (!cvs.length) return null;
+    if (!cvs.length) return [];
     else return await getRepository(JobToCv).find({cvId: In(cvs.map((cv) => cv.id))});
   }
 
@@ -353,8 +355,6 @@ export class JobService extends TypeOrmCrudService<Job> {
       return await this.userRepository.findByIds(userIds, {
         relations: [
           'profile',
-          'profile.profileSkill',
-          'profile.educationProfile',
         ],
       });
     } catch (err) {
