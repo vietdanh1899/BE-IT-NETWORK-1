@@ -46,16 +46,6 @@ export class Address extends Base {
     type => User,
     user => user.address,
   )
-  @JoinTable({
-    joinColumn: {
-      name: 'addressId',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'userId',
-      referencedColumnName: 'id',
-    },
-  })
   user: User[];
 
   /**

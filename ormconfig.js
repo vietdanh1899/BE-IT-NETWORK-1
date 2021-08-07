@@ -20,5 +20,7 @@ module.exports = [
     entities: ['src/**/*.entity{.ts,.js}'],
     seeds: ['src/database/seeds/**/*.seed{.ts,.js}'],
     factories: ['src/database/factories/**/*.factory{.ts,.js}'],
+    // seeds: ['src/database/seeds/04-category.seed.ts'],
+    // factories: ['src/database/factories/category.factory.ts'],
   },
 ];

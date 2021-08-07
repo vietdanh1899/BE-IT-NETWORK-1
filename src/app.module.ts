@@ -19,14 +19,8 @@ import { LoggingInterceptor } from './interceptors/logging.interceptor';
 import { TransformInterceptor } from './interceptors/TransformInterceptor';
 import { PermissionModule } from './App/permission/permission.module';
 import { JobsModule } from './App/jobs/jobs.module';
-import { AuthorizationMiddleware } from './core/middleware/authorization.middleware';
-import { ArticlesModule } from './App/articles/articles.module';
 import { AddressModule } from './App/address/address.module';
 import { UploadModule } from './App/upload/upload/upload.module';
-import { SkillModule } from './App/skill/skill.module';
-import { EducationModule } from './App/education/education/education.module';
-import { ExperienceModule } from './App/experience/experience.module';
-import { NotificationsModule } from './App/notifications/notifications.module';
 import { ApplyController } from './apply/apply.controller';
 
 @Module({
@@ -39,11 +33,6 @@ import { ApplyController } from './apply/apply.controller';
     AddressModule,
     JobsModule,
     UploadModule,
-    ArticlesModule,
-    SkillModule,
-    EducationModule,
-    NotificationsModule,
-    ExperienceModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useClass: TypeOrmConfigService,
@@ -51,7 +40,6 @@ import { ApplyController } from './apply/apply.controller';
     MulterModule.register({
       dest: './uploads',
     }),
-    ArticlesModule,
   ],
   controllers: [AppController, ApplyController],
   providers: [

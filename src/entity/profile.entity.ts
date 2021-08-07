@@ -17,9 +17,6 @@ import {
 } from 'class-validator';
 import { CrudValidationGroups } from '@nestjsx/crud';
 import { User } from './user.entity';
-import { ProfileSkill } from './ProfileSkill.entity';
-import { EducationProfile } from './EducationProfile.entity';
-import { Experience } from './experience.entity';
 import { CV } from './cv.entity';
 const { CREATE, UPDATE } = CrudValidationGroups;
 
@@ -73,38 +70,6 @@ export class Profile extends Base {
   )
   user: User;
 
-  /** Relation to ProfileSkill */
-
-  @OneToMany(
-    type => ProfileSkill,
-    profileSkill => profileSkill.profile,
-    {
-      cascade: true,
-    },
-  )
-  profileSkill: ProfileSkill[];
-
-  /** Relation to EducationProfile */
-
-  @OneToMany(
-    type => EducationProfile,
-    educationProfile => educationProfile.profile,
-    {
-      cascade: true,
-    },
-  )
-  educationProfile: EducationProfile[];
-
-  /** Relation to Experience */
-
-  @OneToMany(
-    type => Experience,
-    experience => experience.profile,
-    {
-      cascade: true,
-    },
-  )
-  experiences: Experience[];
 
   @OneToMany(() => CV, cv => cv.profile)
   cvs: CV[];

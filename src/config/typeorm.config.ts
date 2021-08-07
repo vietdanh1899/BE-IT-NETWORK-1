@@ -1,6 +1,5 @@
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { Job } from 'src/entity/job.entity';
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
   createTypeOrmOptions(): TypeOrmModuleOptions {
@@ -12,12 +11,12 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      ssl: true,
-      extra: {
-        ssl: {
-          rejectUnauthorized: false
-        }
-      },
+      // ssl: true,
+      // extra: {
+      //   ssl: {
+      //     rejectUnauthorized: false
+      //   }
+      // },
       logging: true,
       synchronize: true,
       entities: ['dist/**/*.entity{.ts,.js}'],

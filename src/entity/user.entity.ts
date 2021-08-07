@@ -10,7 +10,6 @@ import {
   ManyToMany,
   JoinTable,
   Unique,
-  BeforeUpdate,
 } from 'typeorm';
 import { Base } from '../entity/base.entity';
 import {
@@ -29,13 +28,10 @@ import { Exclude, Type } from 'class-transformer';
 import { CrudValidationGroups } from '@nestjsx/crud';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '../entity/role.entity';
-import { Notification } from './notification.entity';
 import { Address } from './address.entity';
 import { Profile } from './profile.entity';
 import { Category } from './category.entity';
-import { EducationsEntity } from './education.entity';
 import { Job } from './job.entity';
-import { Article } from './article.entity';
 import { AppliedJob } from './applied_job.entity';
 const { CREATE, UPDATE } = CrudValidationGroups;
 
@@ -99,19 +95,6 @@ export class User extends Base {
   @JoinColumn({ name: 'roleId' })
   role: Role;
 
-  /**
-   * The relation between User and Notification
-   */
-  @ManyToMany(
-    type => Notification,
-    notification => notification.users,
-  )
-  @JoinTable({
-    name: 'user_notify',
-    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'notify_id', referencedColumnName: 'id' },
-  })
-  notifications: Notification[];
 
   /**
    * The relation between User and Profile
@@ -156,14 +139,6 @@ export class User extends Base {
   )
   categories: Category[];
 
-  /**
-   * The relation between User and Article
-   */
-  @OneToMany(
-    type => Article,
-    article => article.user,
-  )
-  articles: Article[];
 
   /**
    * The relationship between User and JOb
