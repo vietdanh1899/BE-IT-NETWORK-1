@@ -13,6 +13,7 @@ import {
   UsePipes,
   Request,
   SetMetadata,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
@@ -541,15 +542,12 @@ export class JobsController extends BaseController<Job> {
   }
 
   @Get('detail/:jobId')
-  async getJob(@Param('jobId') jobId: string, @Body('userId') userId:string) {
-    console.log(jobId);
+  async getJob(@Param('jobId') jobId: string, @Query('userId') userId:string) {
     const job: any = await getRepository(Job).findOne(jobId);
-    console.log(job);
     if (!job) return null;
     if (userId) {
       const applied = await this.service.getAllAppliedJob(userId);
       const favorite = await this.service.getAllFavoriteJobByUserId(userId);
-      console.log(favorite);
       job.isApplied = applied.some(_jobToCv => _jobToCv.jobId === jobId);
       job.isFavorite = favorite.some(_jobFavorite => _jobFavorite.jobId === jobId);
     }
