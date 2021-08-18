@@ -270,6 +270,7 @@ export class JobsController extends BaseController<Job> {
         id: jobDTO.userId,
       });
       // return acceptedUser;
+      console.log('da goi accept');
       await this.service.acceptJob(jobDTO.userId, id, user.users.id);
       const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -543,7 +544,7 @@ export class JobsController extends BaseController<Job> {
 
   @Get('detail/:jobId')
   async getJob(@Param('jobId') jobId: string, @Query('userId') userId:string) {
-    const job: any = await getRepository(Job).findOne(jobId);
+    const job: any = await getRepository(Job).findOne(jobId, {relations: ["categories", "address"]});
     if (!job) return null;
     if (userId) {
       const applied = await this.service.getAllAppliedJob(userId);

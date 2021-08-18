@@ -181,7 +181,7 @@ export class Job extends Base {
     type => AppliedJob,
     appliedJob => appliedJob.job,
   )
-  appliedBy: User[];
+  appliedBy: AppliedJob[];
 
   /**
    * Recently Job
