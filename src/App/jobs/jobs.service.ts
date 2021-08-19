@@ -196,9 +196,12 @@ export class JobService extends TypeOrmCrudService<Job> {
         const applieduser = job.jobToCvs.map((jtc) => {
           // console.log('co jtc',jtc);
           return {
+            createdat: jtc.createdat,
+            cvId: jtc.cv.id,
             cvURL: jtc.cv.cvURL,
             user: jtc.cv.profile.user,
-            status: jtc.status
+            status: jtc.status,
+            isDenied: jtc.isDenied
           };
         });
       return {
@@ -236,7 +239,7 @@ export class JobService extends TypeOrmCrudService<Job> {
           sjobToCv.forEach(jobToCV => {
             console.log(jobToCV);
             manager.query(
-              `UPDATE "job_to_cv" set "status"= true WHERE "jobToCvId"='${jobToCV.jobToCvId}'`
+              `UPDATE "job_to_cv" set "status"= true, "isDenied"=false WHERE "jobToCvId"='${jobToCV.jobToCvId}'`
             );
           })
         }
@@ -263,9 +266,12 @@ export class JobService extends TypeOrmCrudService<Job> {
       const valuereturn = findJob.map((job) => {
         const applieduser = job.jobToCvs.map((jtc) => {
           return {
+            createdat: jtc.createdat,
+            cvId: jtc.cv.id,
             cvURL: jtc.cv.cvURL,
             user: jtc.cv.profile.user,
-            status: jtc.status
+            status: jtc.status,
+            isDenied: jtc.isDenied
           };
         });
         return {
@@ -368,4 +374,6 @@ export class JobService extends TypeOrmCrudService<Job> {
       throw new InternalServerErrorException('Internal Server Error');
     }
   }
+
+  
 }

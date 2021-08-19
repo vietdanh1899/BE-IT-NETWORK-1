@@ -32,7 +32,7 @@ import { ModuleEnum } from 'src/common/enums/module.enum';
 import { Job } from 'src/entity/job.entity';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { ValidationPipe } from 'src/shared/validation.pipe';
-import { getManager, getRepository, IsNull, Not, Repository } from 'typeorm';
+import { getManager, getRepository, In, IsNull, Not, Repository } from 'typeorm';
 import { JobRepository } from './jobs.repository';
 import { JobService } from './jobs.service';
 import * as _ from 'lodash';
@@ -42,6 +42,7 @@ import { User } from 'src/entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GeoDTO } from './geo.dto';
 import { getDistance } from 'geolib';
+import { JobToCv } from 'src/entity/jobtocv.entity';
 
 // @Controller('api/v2/jobs')
 // export class JobControllerV2 {
@@ -400,16 +401,40 @@ export class JobsController extends BaseController<Job> {
         where: { id },
         relations: ['user', 'user.profile', 'categories', 'address'],
       });
-
-      delete job.user.password;
-      const jobApplied = await manager.query(
-        `SELECT * FROM applied_job WHERE "userId"='${user.users.id}' and "jobId" = '${id}'`,
-      );
-
-      if (jobApplied.length > 0) {
-        return { ...job, applied: true };
+      const jobId = id;
+      const userId = user.users.id;
+      let isFavorite = false;
+      let isApplied = false;
+      let isAccepted = false;
+      let isDenied = false;
+      if (userId) {
+        const applied = await this.service.getAllAppliedJob(userId);
+        const favorite = await this.service.getAllFavoriteJobByUserId(userId);
+        isApplied = applied.some(_jobToCv => _jobToCv.jobId === jobId);
+        isFavorite = favorite.some(_jobFavorite => _jobFavorite.jobId === jobId);
+        const user: User = await getRepository(User).findOne(userId, {relations: ["profile", "profile.cvs"]});
+        const cvs = user.profile.cvs;
+        if (!cvs.length) return null;
+        const sjobToCv = await getRepository(JobToCv).find({jobId: jobId,cvId: In(cvs.map((cv) => cv.id))});
+        isAccepted = sjobToCv.some((jtc) => jtc.status == true);
+        isDenied = !sjobToCv.every((jtc) => jtc.isDenied == false);
       }
-      return { ...job, applied: false };
+      return {
+        ...job,
+        isApplied,
+        isFavorite,
+        isAccepted,
+        isDenied
+      };
+      // delete job.user.password;
+      // const jobApplied = await manager.query(
+      //   `SELECT * FROM applied_job WHERE "userId"='${user.users.id}' and "jobId" = '${id}'`,
+      // );
+
+      // if (jobApplied.length > 0) {
+      //   return { ...job, applied: true };
+      // }
+      // return { ...job, applied: false };
     } catch (error) {
       throw new HttpException(
         {
@@ -544,19 +569,81 @@ export class JobsController extends BaseController<Job> {
 
   @Get('detail/:jobId')
   async getJob(@Param('jobId') jobId: string, @Query('userId') userId:string) {
-    const job: any = await getRepository(Job).findOne(jobId, {relations: ["categories", "address"]});
+    const job: any = await getRepository(Job).findOne(jobId, {relations: ["categories", "address", "user", "user.profile"]});
     if (!job) return null;
+    // if (userId) {
+    //   const applied = await this.service.getAllAppliedJob(userId);
+    //   const favorite = await this.service.getAllFavoriteJobByUserId(userId);
+    //   job.isApplied = applied.some(_jobToCv => _jobToCv.jobId === jobId);
+    //   job.isFavorite = favorite.some(_jobFavorite => _jobFavorite.jobId === jobId);
+    // }
+    // else {
+    //   job.isFavorite = false;
+    //   job.isApplied = false;
+    // }
+    let isFavorite = false;
+    let isApplied = false;
+    let isAccepted = false;
+    let isDenied = false;
     if (userId) {
       const applied = await this.service.getAllAppliedJob(userId);
       const favorite = await this.service.getAllFavoriteJobByUserId(userId);
-      job.isApplied = applied.some(_jobToCv => _jobToCv.jobId === jobId);
-      job.isFavorite = favorite.some(_jobFavorite => _jobFavorite.jobId === jobId);
+      isApplied = applied.some(_jobToCv => _jobToCv.jobId === jobId);
+      isFavorite = favorite.some(_jobFavorite => _jobFavorite.jobId === jobId);
+      const user: User = await getRepository(User).findOne(userId, {relations: ["profile", "profile.cvs"]});
+      const cvs = user.profile.cvs;
+      if (!cvs.length) return null;
+      const sjobToCv = await getRepository(JobToCv).find({jobId: jobId,cvId: In(cvs.map((cv) => cv.id))});
+      isAccepted = sjobToCv.some((jtc) => jtc.status == true);
+      isDenied = !sjobToCv.every((jtc) => jtc.isDenied == false);
     }
-    else {
-      job.isFavorite = false;
-      job.isApplied = false;
-    }
-    return job;
+    return {
+      ...job,
+      isApplied,
+      isFavorite,
+      isAccepted,
+      isDenied
+    };
+    // return job;
+  }
+
+  @Post('/deny')
+  async denyCandidate(@Query('cvId') cvId: string, @Query('jobId') jobId: string) {
+      console.log(cvId);
+      console.log(jobId);
+      console.log('co zo day');
+      const jtc = await getRepository(JobToCv).findOne({where: {cvId: cvId, jobId: jobId}, relations: ["cv", "cv.profile", "cv.profile.user", "job"]});
+      console.log(jtc);
+      if (!jtc) return "not found";
+      await getManager().query(
+          `UPDATE "job_to_cv" set "isDenied"= true, "status"=false WHERE "jobToCvId"='${jtc.jobToCvId}'`
+      );
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'vietdanh.kiemtien.01@gmail.com', // generated ethereal user
+          pass: 'kiemtien01', // generated ethereal password
+        },
+      });
+
+      // send mail with defined transport object
+      const mailOptions = {
+        from: '"Career Network" <vietdanh.kiemtien.01@gmail.com>', // sender address
+        to: jtc.cv.profile.user.email, // list of receivers
+        subject: 'Your CV has been reviewed and denied by the recruitment', // Subject line
+        text: `Congratulation, your CV has been denied by the recruitment for ${jtc.job.name}. Contact them to get more details!`, // plain text body
+      };
+
+      transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+      return {
+          isDenied: true,
+      }
   }
 }
 

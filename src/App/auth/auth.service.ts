@@ -172,6 +172,7 @@ export class AuthServices {
           phone: dto.phone,
           pageURL: dto.website,
           name: dto.name,
+          city: provinces.data.results.find((s) => s.province_id == dto.city[0])?.province_name
         },
         address: findAddress,
       });

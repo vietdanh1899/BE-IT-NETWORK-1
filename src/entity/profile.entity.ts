@@ -32,12 +32,12 @@ export class Profile extends Base {
 
   @IsOptional({ groups: [CREATE, UPDATE] })
   @IsString({ always: true })
-  @Column({ type: 'text', nullable: true, default: null })
+  @Column({ type: 'text', nullable: true, default: 'https://cdn.iconscout.com/icon/free/png-256/profile-417-1163876.png' })
   profileUrl: string;
 
   @IsOptional({ groups: [CREATE, UPDATE] })
   @IsString({ always: true })
-  @Column({ type: 'text', nullable: true, default: null })
+  @Column({ type: 'text', nullable: true, default: 'http://dut.udn.vn/' })
   pageURL: string;
 
   @IsOptional({ groups: [CREATE, UPDATE] })
@@ -61,6 +61,9 @@ export class Profile extends Base {
 
   @Column({ type: 'integer', default: 0 })
   view: number;
+
+  @Column({ type: 'text', nullable: true, default: 'Đà Nẵng' })
+  city: string;
 
   /** Relation to User */
 

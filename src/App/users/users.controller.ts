@@ -249,7 +249,7 @@ export class UserController extends BaseController<User> {
           limit: req.query.hasOwnProperty('limit') ? req.query.limit : 10,
           page: req.query.hasOwnProperty('page') ? req.query.page : 1,
         },
-        { relations: ['role'] },
+        { relations: ['role', 'profile'] },
         { condition: { deletedat: Not(IsNull()) } },
       );
       return results;
@@ -300,7 +300,7 @@ export class UserController extends BaseController<User> {
           limit: req.query.hasOwnProperty('limit') ? req.query.limit : 10,
           page: req.query.hasOwnProperty('page') ? req.query.page : 1,
         },
-        { relations: ['role'] },
+        { relations: ['role', 'profile'] },
         { condition: { active: false } },
       );
 

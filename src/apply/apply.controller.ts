@@ -1,19 +1,58 @@
-import { Body, ConflictException, Controller, Delete, Get, InternalServerErrorException, Param, Post } from '@nestjs/common';
+import { Body, ConflictException, Controller, Delete, Get, InternalServerErrorException, Param, Post, Res, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AppliedJob } from 'src/entity/applied_job.entity';
 import { CV } from 'src/entity/cv.entity';
 import { Job } from 'src/entity/job.entity';
 import { JobToCv } from 'src/entity/jobtocv.entity';
 import { User } from 'src/entity/user.entity';
 import { getManager, getRepository, In } from 'typeorm';
+import { UploadedFile } from  '@nestjs/common';
+import { diskStorage } from  'multer';
+import { extname } from  'path';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 
 @Controller('apply')
 export class ApplyController {
     private readonly manager = getManager();
-    // private readonly jobRepository = getRepository(Job);
-    // private readonly userRepository = getRepository(User);
-    // private readonly cvRepository = getRepository(CV);
 
-    
+    @Get('/getfile/:fileId')
+    serveFile(@Param('fileId') fileId: string, @Res() res) {
+        res.sendFile(fileId, { root: 'uploads' }) ;
+    }
+   
+    @Post('/upload')
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        type: 'multipart/form-data',
+        required: true,
+        schema: {
+            type: 'object',
+            properties: {
+            file: {
+                type: 'string',
+                format: 'binary',
+            },
+            },
+        },
+    })
+    @UseInterceptors(FileInterceptor('file',
+      {
+        storage: diskStorage({
+          destination: './uploads', 
+          filename: (req, file, cb) => {
+          const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+          return cb(null, `${randomName}${extname(file.originalname)}`)
+        }
+        })
+      }
+    )
+    )
+    upload(@UploadedFile() file) {
+        console.log(file);
+        return {
+            url: `https://vietdanh.loca.lt/apply/getfile/${file.filename}`,
+        };
+    }
     
     @Get('/cv/:userId')
     async getCv(@Param('userId') userId: string) {
@@ -50,7 +89,9 @@ export class ApplyController {
     async deleteCv(@Param('CVid') CVid: string) {
         try {
             const cv: CV = await getRepository(CV).findOne(CVid);
-            return await getRepository(CV).delete(cv);
+            const sjtc = await getRepository(JobToCv).find({cvId: cv.id});
+            if (sjtc.length) return "Applied cv cannot be delete";
+            else return await getRepository(CV).delete(cv);
         }
         catch (err) {
             console.error(err);
@@ -89,4 +130,8 @@ export class ApplyController {
         return await getRepository(JobToCv).find({cvId: In(cvs.map((cv) => cv.id))});
         // console.log(appliedJobs);
     }
+
+    
 }
+
+

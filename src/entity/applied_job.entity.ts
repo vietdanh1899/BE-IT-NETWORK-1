@@ -23,6 +23,9 @@ export class AppliedJob extends Base {
   @Column({ type: 'boolean', default: false })
   status: boolean;
 
+  @Column({default: false})
+  public isDenied: boolean;
+
   @ManyToOne(
     type => Job,
     job => job.appliedBy,
