@@ -47,17 +47,7 @@ export class AuthController {
     return result;
   }
 
-  @Post('register')
-  @UsePipes(new ValidationPipe())
-  async Register(@Body() data: RegisterDTO) {
-    return this.authService.register(data);
-  }
-
-  @Post('newlead')
-  @UsePipes(new ValidationPipe())
-  async addLead(@Body() data: EmployersDTO) {
-    return this.authService.addLead(data);
-  }
+  
 
   @Put('me/password')
   @Methods(methodEnum.UPDATE)
@@ -106,10 +96,4 @@ export class AuthController {
     return await this.authService.getRecently(id);
   }
 
-  // @Put('me')
-  // @Methods(methodEnum.UPDATE)
-  // async update
-
-  @Post('forgot-password')
-  async forgotPassword() {}
 }

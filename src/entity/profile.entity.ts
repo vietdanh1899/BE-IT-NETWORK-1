@@ -27,33 +27,33 @@ export class Profile extends Base {
 
   @IsOptional({ groups: [UPDATE] })
   @IsString({ always: true })
-  @Column({ type: 'text', nullable: false })
+  @Column({ nullable: false })
   name: string;
 
   @IsOptional({ groups: [CREATE, UPDATE] })
   @IsString({ always: true })
-  @Column({ type: 'text', nullable: true, default: 'https://cdn.iconscout.com/icon/free/png-256/profile-417-1163876.png' })
+  @Column({type: 'text', nullable: true, default: 'https://cdn.iconscout.com/icon/free/png-256/profile-417-1163876.png' })
   profileUrl: string;
 
   @IsOptional({ groups: [CREATE, UPDATE] })
   @IsString({ always: true })
-  @Column({ type: 'text', nullable: true, default: 'http://dut.udn.vn/' })
+  @Column({ nullable: true, default: 'http://dut.udn.vn/' })
   pageURL: string;
 
   @IsOptional({ groups: [CREATE, UPDATE] })
   @IsString({ always: true })
-  @Column({ type: 'text', nullable: true, default: null })
+  @Column({ nullable: true, default: null })
   cvURL: string;
 
   @IsOptional({ groups: [UPDATE, CREATE] })
   @IsString({ always: true })
   @MaxLength(255, { always: true })
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true, default: 'Hello fen :XD' })
   introduction: string;
 
   @IsOptional({ groups: [UPDATE, CREATE] })
   @IsPhoneNumber('VN US')
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true, default: '0123456789' })
   phone: string;
 
   @Column({ type: 'decimal', nullable: true })
@@ -62,7 +62,7 @@ export class Profile extends Base {
   @Column({ type: 'integer', default: 0 })
   view: number;
 
-  @Column({ type: 'text', nullable: true, default: 'Đà Nẵng' })
+  @Column({ nullable: true, default: 'Đà Nẵng' })
   city: string;
 
   /** Relation to User */

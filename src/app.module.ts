@@ -1,10 +1,6 @@
 import {
-  MiddlewareConsumer,
   Module,
-  NestModule,
-  RequestMethod,
 } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './App/users/users.module';
@@ -20,11 +16,15 @@ import { TransformInterceptor } from './interceptors/TransformInterceptor';
 import { PermissionModule } from './App/permission/permission.module';
 import { JobsModule } from './App/jobs/jobs.module';
 import { AddressModule } from './App/address/address.module';
-import { UploadModule } from './App/upload/upload/upload.module';
-import { ApplyController } from './apply/apply.controller';
+import { ApplyController } from './App/apply/apply.controller';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+    }),
     ConfigModule.forRoot(),
     UsersModule,
     CategoriesModule,
@@ -32,7 +32,6 @@ import { ApplyController } from './apply/apply.controller';
     AuthModule,
     AddressModule,
     JobsModule,
-    UploadModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useClass: TypeOrmConfigService,
@@ -41,7 +40,7 @@ import { ApplyController } from './apply/apply.controller';
       dest: './uploads',
     }),
   ],
-  controllers: [AppController, ApplyController],
+  controllers: [ ApplyController],
   providers: [
     {
       provide: APP_FILTER,
@@ -59,10 +58,4 @@ import { ApplyController } from './apply/apply.controller';
   ],
 })
 export class AppModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer.apply(AuthorizationMiddleware).forRoutes({
-  //     path: 'api/v1/categories/updateOne/:slug',
-  //     method: RequestMethod.PUT,
-  //   });
-  // }
 }

@@ -39,6 +39,6 @@ export class RolePermission extends Base {
   @JoinColumn({ name: 'permissionId' })
   permission: PermissionsEntity;
 
-  @Column({ type: 'enum', enum: posessionEnum, default: 'ANY' })
+  @Column({default: 'ANY' })
   posession: string;
 }

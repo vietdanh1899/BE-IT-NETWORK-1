@@ -34,12 +34,12 @@ export class Category extends TreeBase {
     example: 'fiction',
   })
   @IsString({ always: true })
-  @Column({ type: 'text' })
+  @Column()
   name: string;
 
   @IsOptional({ groups: [CREATE, UPDATE] })
   @IsOptional()
-  @Column({ type: 'text' })
+  @Column()
   slug: string;
 
   @TreeChildren()

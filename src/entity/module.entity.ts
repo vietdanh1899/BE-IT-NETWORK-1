@@ -13,7 +13,7 @@ export class ModulesEntity {
   id: number;
 
   @ApiProperty({ example: 'NOTIFICATION' })
-  @Column('text')
+  @Column()
   module: string;
 
   @OneToMany(

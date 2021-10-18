@@ -28,7 +28,7 @@ export class Address extends Base {
   @IsOptional({ groups: [UPDATE] })
   @IsNotEmpty({ groups: [CREATE] })
   @IsString({ always: true })
-  @Column({ type: 'text', nullable: true })
+  @Column({ nullable: true })
   description: string;
 
   @IsOptional({ groups: [UPDATE, CREATE] })

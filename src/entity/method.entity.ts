@@ -11,7 +11,7 @@ import { PermissionsEntity } from './permission.entity';
 export class MethodsEntity {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column('text')
+  @Column()
   method: string;
   @OneToMany(
     type => PermissionsEntity,

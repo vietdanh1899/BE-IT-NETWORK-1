@@ -30,6 +30,7 @@ import axios from 'axios';
 import { AddressRepository } from '../address/address.repository';
 import { Profile } from 'src/entity/profile.entity';
 import { Job } from 'src/entity/job.entity';
+import RoleId from 'src/types/RoleId';
 
 @Injectable()
 export class AuthServices {
@@ -164,7 +165,7 @@ export class AuthServices {
         `SELECT * FROM ${this.addressRepository.metadata.tableName} WHERE id in ${query} `,
       );
       const data = this.userRepository.create({
-        roleId: 4,
+        roleId: RoleId.CONTRIBUTOR,
         email: dto.email,
         active: false,
         password: 'default',
@@ -176,6 +177,7 @@ export class AuthServices {
         },
         address: findAddress,
       });
+      console.log('Toi save');
       await this.userRepository.save(data);
       const { email, id, role, roleId, profile, createdat, updatedat } = data;
       return { email, id, role, roleId, profile, createdat, updatedat };

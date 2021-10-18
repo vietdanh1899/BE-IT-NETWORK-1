@@ -7,7 +7,7 @@ import { RolePermission } from './role_permission.entity';
 export class Role extends Base {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column('text')
+  @Column()
   role: string;
   @OneToMany(
     type => User,

@@ -38,14 +38,14 @@ export class Job extends Base {
   @IsOptional({ groups: [UPDATE] })
   @IsNotEmpty({ groups: [CREATE] })
   @IsString({ always: true })
-  @Column({ type: 'text' })
+  @Column()
   name: string;
 
   @ApiProperty({ example: 'string' })
   @IsOptional({ groups: [UPDATE] })
   @IsNotEmpty({ groups: [CREATE] })
   @IsString({ always: true })
-  @Column({ type: 'text', nullable: true })
+  @Column({nullable: true })
   content: string;
 
   @ApiProperty({ example: 1000 })
@@ -63,13 +63,13 @@ export class Job extends Base {
   @ApiProperty({ example: 'string' })
   @IsOptional({ groups: [UPDATE, CREATE] })
   @IsString({ always: true })
-  @Column({ type: 'text', nullable: true })
+  @Column({type: 'text', nullable: true })
   description: string;
 
   @ApiProperty({ example: 'FULLTIME | PARTTIME' })
   @IsOptional({ groups: [UPDATE, CREATE] })
   @IsIn(enumToArray(JobType))
-  @Column({ type: 'enum', enum: JobType, nullable: true })
+  @Column({ nullable: true })
   type: string;
 
   @ApiProperty({ example: 1 })
@@ -89,13 +89,13 @@ export class Job extends Base {
   })
   @IsOptional({ groups: [CREATE, UPDATE] })
   @IsString({ always: true })
-  @Column({ type: 'text', nullable: true })
+  @Column({ nullable: true })
   introImg: string;
 
   @IsOptional({ groups: [UPDATE, CREATE] })
   @Exclude()
   @IsBoolean()
-  @Column({ type: 'boolean', default: false })
+  @Column({ default: false })
   status: boolean;
 
   @ApiProperty({ example: [3, 2, 19] })

@@ -11,6 +11,8 @@ import {
   NotFoundException,
   SetMetadata,
   BadRequestException,
+  Post,
+  Body,
 } from '@nestjs/common';
 import {
   CrudRequest,
@@ -42,6 +44,9 @@ import * as _ from 'lodash';
 import { UserDTO } from './user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Profile } from 'src/entity/profile.entity';
+import RoleId from 'src/types/RoleId';
+import { EmployersDTO, RegisterDTO } from '../auth/auth.dto';
+import { AuthServices } from '../auth/auth.service';
 
 @Crud({
   model: {
@@ -78,6 +83,7 @@ import { Profile } from 'src/entity/profile.entity';
 @SetMetadata('entity', ['users'])
 export class UserController extends BaseController<User> {
   constructor(
+    private authService: AuthServices,
     public service: UserService,
     private readonly repository: UserRepository,
     @InjectRepository(Profile)
@@ -180,7 +186,7 @@ export class UserController extends BaseController<User> {
       throw new NotFoundException('User not Found');
     }
 
-    if (user.roleId === 1 && dto.roleId !== 1) {
+    if (user.roleId === RoleId.ADMIN && dto.roleId !== RoleId.ADMIN) {
       throw new BadRequestException('Role Admin can not be modified');
     }
     if (dto.roleId !== user.roleId) {
@@ -327,7 +333,7 @@ export class UserController extends BaseController<User> {
     @Param('id') userId: string,
   ) {
     const user = await this.repository.findOne({
-      where: { id: userId, roleId: 4 },
+      where: { id: userId, roleId: RoleId.CONTRIBUTOR },
     });
     if (user && !user.active) {
       const generatePassword = this.customerPassword();
@@ -470,4 +476,17 @@ export class UserController extends BaseController<User> {
       
     }
   }
+
+  @Post('register')
+  @UsePipes(new ValidationPipe())
+  async Register(@Body() data: RegisterDTO) {
+    return this.authService.register(data);
+  }
+
+  @Post('registerContributor')
+  @UsePipes(new ValidationPipe())
+  async addLead(@Body() data: EmployersDTO) {
+    return this.authService.addLead(data);
+  }
+  
 }

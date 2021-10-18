@@ -21,6 +21,7 @@ import * as _ from 'lodash';
 import { User } from 'src/entity/user.entity';
 import { JobToCv } from 'src/entity/jobtocv.entity';
 import { isUUID } from 'class-validator';
+import RoleId from 'src/types/RoleId';
 
 @Injectable()
 export class JobService extends TypeOrmCrudService<Job> {
@@ -97,7 +98,7 @@ export class JobService extends TypeOrmCrudService<Job> {
       throw new NotFoundException(`Job not found`);
     }
 
-    if (!user || user.roleId === 4) {
+    if (!user || user.roleId === RoleId.CONTRIBUTOR) {
       throw new NotFoundException('Current User is not available');
     }
     try {

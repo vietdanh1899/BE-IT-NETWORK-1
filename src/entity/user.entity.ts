@@ -71,12 +71,12 @@ export class User extends Base {
   @Exclude()
   @IsBoolean()
   @IsOptional({ groups: [UPDATE] })
-  @Column({ type: 'boolean', default: false })
+  @Column({ default: false })
   ExpiredToken: boolean;
 
   @IsBoolean()
   @IsOptional({ groups: [CREATE] })
-  @Column({ type: 'boolean', default: true })
+  @Column({ default: true })
   active: boolean;
 
   @ApiProperty({ example: 3 })

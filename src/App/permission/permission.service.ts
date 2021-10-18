@@ -15,6 +15,7 @@ import { RolePermission } from 'src/entity/role_permission.entity';
 import { PermissionDTO } from './permission.dto';
 import { UserRepository } from '../users/user.repository';
 import { ModulesEntity } from 'src/entity/module.entity';
+import RoleId from 'src/types/RoleId';
 
 @Injectable()
 export class PermissionService {
@@ -164,7 +165,7 @@ export class PermissionService {
         const permission = await this.permissionRepository.save(newPermission);
 
         const newRolePermission = await this.repository.create({
-          roleId: 1,
+          roleId: RoleId.ADMIN,
           permissionId: newPermission.id,
           posession: 'ANY',
         });

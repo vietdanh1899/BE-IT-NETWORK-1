@@ -10,7 +10,6 @@ export default class CreateRoles implements Seeder {
       .into(Role)
       .values([
         { role: 'ADMIN' },
-        { role: 'MODERATOR' },
         { role: 'USER' },
         { role: 'CONTRIBUTOR' },
       ])

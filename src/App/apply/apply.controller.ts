@@ -9,16 +9,12 @@ import { getManager, getRepository, In } from 'typeorm';
 import { UploadedFile } from  '@nestjs/common';
 import { diskStorage } from  'multer';
 import { extname } from  'path';
-import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Apply')
 @Controller('apply')
 export class ApplyController {
     private readonly manager = getManager();
-
-    @Get('/getfile/:fileId')
-    serveFile(@Param('fileId') fileId: string, @Res() res) {
-        res.sendFile(fileId, { root: 'uploads' }) ;
-    }
    
     @Post('/upload')
     @ApiConsumes('multipart/form-data')
@@ -50,7 +46,7 @@ export class ApplyController {
     upload(@UploadedFile() file) {
         console.log(file);
         return {
-            url: `https://vietdanh.loca.lt/apply/getfile/${file.filename}`,
+            url: `https://vietdanh.bike/${file.filename}`,
         };
     }
     

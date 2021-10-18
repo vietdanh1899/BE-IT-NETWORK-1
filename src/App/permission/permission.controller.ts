@@ -35,6 +35,7 @@ import { PermissionsEntity } from 'src/entity/permission.entity';
 import { ModulesEntity } from 'src/entity/module.entity';
 import { RoleDTO } from './role.dto';
 import { PerPosDTO } from './perpos.dto';
+import RoleId from 'src/types/RoleId';
 
 // @Crud({
 //   model: {
@@ -110,7 +111,7 @@ export class PermissionController {
   @Delete(':id')
   @Methods(methodEnum.DELETE)
   async deleteOne(@Param('id') id: number, @Body() data: PermissionDTO) {
-    if (data.roleId === 1) {
+    if (data.roleId === RoleId.ADMIN) {
       throw new BadRequestException('Permission roleAdmin can not be Modified');
     }
 
@@ -135,7 +136,7 @@ export class PermissionController {
     @Param('permissionId') permissionId: number,
     @Body() dto: PermissionDTO,
   ) {
-    if (dto.roleId == 1) {
+    if (dto.roleId == RoleId.ADMIN) {
       throw new BadRequestException('Posession roleAdmin can not be Modified');
     }
 

@@ -11,6 +11,7 @@ import * as _ from 'lodash';
 import slugify from 'slugify';
 import axios from 'axios';
 import { Address } from '../../entity/address.entity';
+import RoleId from 'src/types/RoleId';
 
 export default class JobsSeeder implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<any> {
@@ -46,7 +47,7 @@ export default class JobsSeeder implements Seeder {
       4400,
       5000,
     ];
-    const author = await authorRepository.find({ where: { roleId: 4 } });
+    const author = await authorRepository.find({ where: { roleId: RoleId.CONTRIBUTOR } });
     const [cate, count] = await cateRepository.findAndCount();
 
     /**

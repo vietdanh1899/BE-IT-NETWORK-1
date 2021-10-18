@@ -9,6 +9,7 @@ import axios from 'axios';
 import slugify from 'slugify';
 import * as Faker from 'faker';
 import { Profile } from '../../entity/profile.entity';
+import RoleId from 'src/types/RoleId';
 
 export default class CompanySeeder implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<any> {
@@ -65,7 +66,7 @@ export default class CompanySeeder implements Seeder {
               {
                 email: email,
                 password: await bcrypt.hash('admin', 12),
-                roleId: 4,
+                roleId: RoleId.CONTRIBUTOR,
                 profile,
               },
             ])

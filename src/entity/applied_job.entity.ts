@@ -20,7 +20,7 @@ export class AppliedJob extends Base {
   @PrimaryGeneratedColumn()
   index_name: number;
 
-  @Column({ type: 'boolean', default: false })
+  @Column({default: false})
   status: boolean;
 
   @Column({default: false})
