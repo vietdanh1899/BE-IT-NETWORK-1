@@ -33,7 +33,7 @@ import { Profile } from './profile.entity';
 import { Category } from './category.entity';
 import { Job } from './job.entity';
 import { AppliedJob } from './applied_job.entity';
-import RoleId from 'src/types/RoleId';
+import RoleId from '../../src/types/RoleId';
 const { CREATE, UPDATE } = CrudValidationGroups;
 
 @Entity('users')
