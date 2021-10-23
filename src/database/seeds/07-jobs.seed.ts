@@ -11,7 +11,7 @@ import * as _ from 'lodash';
 import slugify from 'slugify';
 import axios from 'axios';
 import { Address } from '../../entity/address.entity';
-import RoleId from 'src/types/RoleId';
+import RoleId from '../../../src/types/RoleId';
 
 export default class JobsSeeder implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<any> {

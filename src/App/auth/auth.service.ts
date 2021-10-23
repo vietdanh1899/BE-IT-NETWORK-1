@@ -301,10 +301,11 @@ export class AuthServices {
   async getRecently(id: string) {
     try {
       const manager = getManager();
-
+      console.log(id)
       const jobRecently = await manager.query(
         `SELECT "jobId" FROM ${this.job_recently} WHERE "userId"='${id}'`,
       );
+      console.log(jobRecently)
       const jobId = jobRecently.map(job => {
         return job.jobId;
       });
@@ -313,11 +314,13 @@ export class AuthServices {
         where: {},
         relations: ['user', 'user.profile', 'categories', 'address'],
       });
+      console.log('jobs', jobs)
       return jobs.map(job => {
         delete job.user.password;
         return job;
       });
     } catch (err) {
+      console.log(err)
       throw new InternalServerErrorException('Server Error');
     }
   }

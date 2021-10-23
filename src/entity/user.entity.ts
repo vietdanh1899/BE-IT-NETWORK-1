@@ -33,6 +33,7 @@ import { Profile } from './profile.entity';
 import { Category } from './category.entity';
 import { Job } from './job.entity';
 import { AppliedJob } from './applied_job.entity';
+import RoleId from 'src/types/RoleId';
 const { CREATE, UPDATE } = CrudValidationGroups;
 
 @Entity('users')
@@ -80,8 +81,8 @@ export class User extends Base {
   active: boolean;
 
   @ApiProperty({ example: 3 })
-  @IsIn([2, 3, 4])
-  @Column({ type: 'int', default: 3 })
+  @IsIn([RoleId.ADMIN, RoleId.CONTRIBUTOR, RoleId.USER])
+  @Column({ type: 'int', default: RoleId.USER })
   roleId: number;
 
   /**

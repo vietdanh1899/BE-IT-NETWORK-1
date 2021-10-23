@@ -2,7 +2,7 @@ import { Factory, Seeder } from 'typeorm-seeding';
 import { Connection, getConnection } from 'typeorm';
 import { User } from '../../entity/user.entity';
 import * as bcrypt from 'bcrypt';
-import RoleId from 'src/types/RoleId';
+import RoleId from '../../../src/types/RoleId';
 
 export default class CreateRoles implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<any> {
