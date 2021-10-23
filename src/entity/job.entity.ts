@@ -27,6 +27,7 @@ import { Address } from './address.entity';
 import { Exclude } from 'class-transformer';
 import { AppliedJob } from './applied_job.entity';
 import { JobToCv } from './jobtocv.entity';
+import { Tag } from './tag.entity';
 
 const { CREATE, UPDATE } = CrudValidationGroups;
 @Entity('jobs')
@@ -205,4 +206,24 @@ export class Job extends Base {
 
   @OneToMany(() => JobToCv, jobToCv => jobToCv.job)
   public jobToCvs!: JobToCv[];
+
+   /**
+   * The relationship between User and Tag
+   *
+   */
+    @ManyToMany(
+      type => Tag,
+      tag => tag.jobs,
+    )
+    @JoinTable({
+      joinColumn: {
+        name: 'jobId',
+        referencedColumnName: 'id',
+      },
+      inverseJoinColumn: {
+        name: 'tagId',
+        referencedColumnName: 'id',
+      },
+    })
+    tags: Tag[];
 }

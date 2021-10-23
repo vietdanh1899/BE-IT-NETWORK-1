@@ -1,5 +1,5 @@
 import { User } from '../../entity/user.entity';
-import { Connection, getManager } from 'typeorm';
+import { Connection, getManager, In } from 'typeorm';
 import { Factory, Seeder } from 'typeorm-seeding';
 import { Category } from '../../entity/category.entity';
 import * as jobsData from '../data/jobs.json';
@@ -12,12 +12,15 @@ import slugify from 'slugify';
 import axios from 'axios';
 import { Address } from '../../entity/address.entity';
 import RoleId from '../../../src/types/RoleId';
+import { Tag } from '../../../src/entity/tag.entity';
+import { name } from 'faker';
 
 export default class JobsSeeder implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<any> {
     const authorRepository = connection.getRepository(User);
     const cateRepository = connection.getRepository(Category);
     const addressRepository = connection.getRepository(Address);
+    const tagRepository = connection.getRepository(Tag);
     const lowestSalary = [450, 500, 1000, 1500, 2000, 3000];
     const introImg = [
       'https://images.theconversation.com/files/344201/original/file-20200626-33533-13frdsm.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=1200&h=675.0&fit=crop',
@@ -64,49 +67,39 @@ export default class JobsSeeder implements Seeder {
       const currentYear = date.getFullYear();
       const dueDate = this.getRndInteger(currentDate, 31);
 
-      const provinces = await await axios.get(
+      const jobTags = jobsData[index].tags;
+      const provinces =  await axios.get(
         'https://vapi.vnappmob.com/api/province',
       );
       const splitAddress = _.split(jobsData[index].address, ',');
 
       const city = this.getSlug(_.last(splitAddress));
 
-      // for (let track = 0; track < provinces.data.results.length; track++) {
-      //   const splitProvince = _.split(
-      //     this.getSlug(provinces.data.results[track].province_name),
-      //     '-',
-      //   );
-      //   if (_.indexOf(splitProvince, 'pho') >= 0) {
-      //     splitProvince.splice(0, 2);
-      //   } else {
-      //     splitProvince.splice(0, 1);
-      //   }
-      //   const joinProvince = splitProvince.join('-');
+      for (let track = 0; track < provinces.data.results.length; track++) {
+        const splitProvince = _.split(
+          this.getSlug(provinces.data.results[track].province_name),
+          '-',
+        );
+        if (_.indexOf(splitProvince, 'pho') >= 0) {
+          splitProvince.splice(0, 2);
+        } else {
+          splitProvince.splice(0, 1);
+        }
+        const joinProvince = splitProvince.join('-');
 
-      //   if (joinProvince === city) {
-      //     if (results.data.results.length >= 0) {
-      //       await factory(Address)({
-      //         payload: {
-      //           city: provinces.data.results[track].province_id,
-      //           description: jobsData[index].address,
-      //           latitude: results.data.results[0].geometry.location.lat,
-      //           longitude: results.data.results[0].geometry.location.lng,
-      //         },
-      //       }).create();
-      //     } else {
-      //       await factory(Address)({
-      //         payload: {
-      //           city: provinces.data.results[track].province_id,
-      //           description: jobsData[index].address,
-      //           latitude: null,
-      //           longitude: null,
-      //         },
-      //       }).create();
-      //     }
-      //     break;
-      //   }
-      // }
-/* */
+        if (joinProvince === city) {
+            await factory(Address)({
+              payload: {
+                city: provinces.data.results[track].province_id,
+                description: jobsData[index].address,
+                latitude: null,
+                longitude: null,
+              },
+            }).create();
+          break;
+        }
+      }
+
       const findAddress = await addressRepository.findOne({
         order: { createdat: 'DESC' },
       });
@@ -134,7 +127,18 @@ export default class JobsSeeder implements Seeder {
         },
       }).create();
 
+      console.log('job tag', jobTags);
+      
+      const [tagIds, numberOfTag] = await tagRepository.findAndCount({where: {name: In(jobTags) }, select: ['id']});
+      
+      let values = new Array();
+      for (let index = 0; index < numberOfTag; index ++)
+      {
+        values.push(`('${newJob.id}','${tagIds[index].id}')`);
+      }
+
       const manager = await getManager();
+      await manager.query(`INSERT INTO tags_jobs_jobs(jobId, tagId) values ${values.join(',').concat(';')}`);
       for (let index = 0; index < numberOfCate; index++) {
         const rndIndex = Math.floor(Math.random() * count);
         console.log('random', rndIndex);
