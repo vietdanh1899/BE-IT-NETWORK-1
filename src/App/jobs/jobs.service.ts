@@ -376,5 +376,13 @@ export class JobService extends TypeOrmCrudService<Job> {
     }
   }
 
+  async getAllItemProfile()
+  {
+    return this.repository.getAllProfileItem();
+  }
   
+  async getAllCurrentTags()
+  {
+    return this.repository.getAllCurrentTagsAsync();
+  }
 }

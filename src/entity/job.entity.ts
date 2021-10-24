@@ -214,6 +214,7 @@ export class Job extends Base {
     @ManyToMany(
       type => Tag,
       tag => tag.jobs,
+      { cascade: true } 
     )
     @JoinTable({
       joinColumn: {
@@ -224,6 +225,7 @@ export class Job extends Base {
         name: 'tagId',
         referencedColumnName: 'id',
       },
+      name: 'job_tag'
     })
     tags: Tag[];
 }

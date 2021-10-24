@@ -16,7 +16,6 @@ interface ConditionType {
 }
 export class BaseRepository<T> extends Repository<T> {
   constructor() {
-    console.log('base Repo');
     super();
   }
   async paginate(

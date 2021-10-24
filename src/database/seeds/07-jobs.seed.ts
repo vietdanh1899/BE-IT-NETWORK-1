@@ -126,8 +126,6 @@ export default class JobsSeeder implements Seeder {
           introImg: introImg[Math.floor(Math.random() * introImg.length)],
         },
       }).create();
-
-      console.log('job tag', jobTags);
       
       const [tagIds, numberOfTag] = await tagRepository.findAndCount({where: {name: In(jobTags) }, select: ['id']});
       
@@ -138,7 +136,7 @@ export default class JobsSeeder implements Seeder {
       }
 
       const manager = await getManager();
-      await manager.query(`INSERT INTO tags_jobs_jobs(jobId, tagId) values ${values.join(',').concat(';')}`);
+      await manager.query(`INSERT INTO job_tag(jobId, tagId) values ${values.join(',').concat(';')}`);
       for (let index = 0; index < numberOfCate; index++) {
         const rndIndex = Math.floor(Math.random() * count);
         console.log('random', rndIndex);
