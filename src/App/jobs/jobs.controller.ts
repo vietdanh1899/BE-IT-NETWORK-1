@@ -130,7 +130,6 @@ export class JobsController extends BaseController<Job> {
   @Override('getManyBase')
   async getMany(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: Job) {
     try {
-      console.log(JSON.stringify(req));
       const favorite = await this.service.getAllFavoriteJob();
       // const allJob = await this.base.getManyBase(req);
       // for (let i = 0; i < count(allJob); i++)
@@ -400,7 +399,7 @@ export class JobsController extends BaseController<Job> {
       }
       const job = await this.repository.findOne({
         where: { id },
-        relations: ['user', 'user.profile', 'categories', 'address'],
+        relations: ['user', 'user.profile', 'tags', 'address'],
       });
       const jobId = id;
       const userId = user.users.id;
@@ -609,6 +608,15 @@ export class JobsController extends BaseController<Job> {
     // return job;
   }
 
+  @Get('/item-profile/all')
+  async getItemProfile() {
+    return this.service.getAllItemProfile();
+  }
+
+  @Get('/tags/all')
+  async getAllCurrentTags() {
+    return this.service.getAllCurrentTags();
+  }
   @Post('/deny')
   async denyCandidate(@Query('cvId') cvId: string, @Query('jobId') jobId: string) {
     console.log(cvId);
