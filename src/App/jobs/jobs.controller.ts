@@ -43,7 +43,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { GeoDTO } from './geo.dto';
 import { getDistance } from 'geolib';
 import { JobToCv } from 'src/entity/jobtocv.entity';
-
+import { clientService } from 'src/grpc/route.service';
+import { Point } from 'models/route_guide_pb';
 // @Controller('api/v2/jobs')
 // export class JobControllerV2 {
 //   @Get('/:jobId')
@@ -610,7 +611,18 @@ export class JobsController extends BaseController<Job> {
 
   @Get('/item-profile/all')
   async getItemProfile() {
-    return this.service.getAllItemProfile();
+    const requestParam = new Point();
+    requestParam.setLatitude(409146138);
+    requestParam.setLongitude(-746188906);
+    
+
+    //Remote Procedure Call: Recommendation Server Python
+    const sayHello = await clientService.sayHello(requestParam);
+    console.log('--->say hello', sayHello.getLocation().getLatitude());
+    
+    
+      
+    //ToDo: Get Item By Id 
   }
 
   @Get('/tags/all')
