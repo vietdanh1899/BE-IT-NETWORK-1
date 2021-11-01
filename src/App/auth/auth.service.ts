@@ -103,6 +103,8 @@ export class AuthServices {
         roleId: user.roleId,
       };
     } catch (error) {
+      console.log('-->err', error);
+      
       throw error;
     }
   }
