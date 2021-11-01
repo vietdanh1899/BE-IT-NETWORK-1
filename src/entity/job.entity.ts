@@ -46,7 +46,7 @@ export class Job extends Base {
   @IsOptional({ groups: [UPDATE] })
   @IsNotEmpty({ groups: [CREATE] })
   @IsString({ always: true })
-  @Column({nullable: true })
+  @Column({type: 'nvarchar', length: 'MAX', nullable: true })
   content: string;
 
   @ApiProperty({ example: 1000 })
@@ -64,7 +64,7 @@ export class Job extends Base {
   @ApiProperty({ example: 'string' })
   @IsOptional({ groups: [UPDATE, CREATE] })
   @IsString({ always: true })
-  @Column({type: 'text', nullable: true })
+  @Column({ type: 'nvarchar', length: 'MAX', nullable: true })
   description: string;
 
   @ApiProperty({ example: 'FULLTIME | PARTTIME' })
@@ -207,25 +207,25 @@ export class Job extends Base {
   @OneToMany(() => JobToCv, jobToCv => jobToCv.job)
   public jobToCvs!: JobToCv[];
 
-   /**
-   * The relationship between User and Tag
-   *
-   */
-    @ManyToMany(
-      type => Tag,
-      tag => tag.jobs,
-      { cascade: true } 
-    )
-    @JoinTable({
-      joinColumn: {
-        name: 'jobId',
-        referencedColumnName: 'id',
-      },
-      inverseJoinColumn: {
-        name: 'tagId',
-        referencedColumnName: 'id',
-      },
-      name: 'job_tag'
-    })
-    tags: Tag[];
+  /**
+  * The relationship between User and Tag
+  *
+  */
+  @ManyToMany(
+    type => Tag,
+    tag => tag.jobs,
+    {cascade: true}
+  )
+  @JoinTable({
+    joinColumn: {
+      name: 'jobId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'tagId',
+      referencedColumnName: 'id',
+    },
+    name: 'job_tag'
+  })
+  tags: Tag[];
 }

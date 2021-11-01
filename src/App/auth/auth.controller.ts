@@ -11,13 +11,9 @@ import {
 import { AuthServices } from './auth.service';
 import {
   LoginDTO,
-  RegisterDTO,
   ChangePwdDTO,
-  EmployersDTO,
-  UploadCV,
   UpdatePhoneNumber,
   UploadAvatar,
-  UpdateAddress,
 } from 'src/App/auth/auth.dto';
 import { ValidationPipe } from 'src/shared/validation.pipe';
 import { ApiTags } from '@nestjs/swagger';
@@ -60,14 +56,8 @@ export class AuthController {
   @Methods(methodEnum.UPDATE)
   @UsePipes(new ValidationPipe())
   async uploadAvatar(@Body() body: UploadAvatar, @UserSession() user) {
-    return this.authService.uploadAvatar(user, body);
-  }
-
-  @Patch('me/cv')
-  @Methods(methodEnum.UPDATE)
-  @UsePipes(new ValidationPipe())
-  async uploadCV(@Body() body: UploadCV, @UserSession() user) {
-    return await this.authService.uploadCV(body, user.users.id);
+    console.log(body);
+    return this.authService.uploadAvatar(user.users.id, body);
   }
 
   @Patch('me/phone')

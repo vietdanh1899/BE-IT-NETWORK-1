@@ -26,7 +26,7 @@ import {
 import { BaseController } from 'src/common/Base/base.controller';
 import { Methods } from 'src/common/decorators/method.decorator';
 import { Modules } from 'src/common/decorators/module.decorator';
-import { UserSession } from 'src/common/decorators/user.decorator';
+import { UserDecorator, UserSession } from 'src/common/decorators/user.decorator';
 import { methodEnum } from 'src/common/enums/method.enum';
 import { ModuleEnum } from 'src/common/enums/module.enum';
 import { Job } from 'src/entity/job.entity';
@@ -99,6 +99,10 @@ import { JobToCv } from 'src/entity/jobtocv.entity';
         eager: true,
         exclude: ['createdat', 'updatedat', 'deletedat'],
       },
+      tags: {
+        eager: true,
+        exclude: ['createdat', 'updatedat', 'deletedat'],
+      }
     },
   },
 })
@@ -133,6 +137,7 @@ export class JobsController extends BaseController<Job> {
       const favorite = await this.service.getAllFavoriteJob();
       // const allJob = await this.base.getManyBase(req);
       // for (let i = 0; i < count(allJob); i++)
+      console.log(JSON.stringify(req));
       const response: any = await this.base.getManyBase(req);
 
       let isFavorite: Array<any>;
@@ -389,25 +394,23 @@ export class JobsController extends BaseController<Job> {
   }
 
   @Get('getOne/recently/:id')
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async getOneRecently(@Param('id') id: string, @UserSession() user) {
+  async getOneRecently(@Param('id') id: string, @UserDecorator() user) {
     try {
-      const manager = getManager();
-      if (user.users) {
-        await this.service.updateRecently(user.users.id, id);
-      }
       const job = await this.repository.findOne({
         where: { id },
-        relations: ['user', 'user.profile', 'tags', 'address'],
+        relations: ['user', 'user.profile', 'categories', 'address', 'tags'],
       });
       const jobId = id;
-      const userId = user.users.id;
+      console.log(user)
+      const userId = user?.id;
       let isFavorite = false;
       let isApplied = false;
       let isAccepted = false;
       let isDenied = false;
+      console.log(userId)
       if (userId) {
+        this.service.updateRecently(userId, id);
         const applied = await this.service.getAllAppliedJob(userId);
         const favorite = await this.service.getAllFavoriteJobByUserId(userId);
         isApplied = applied.some(_jobToCv => _jobToCv.jobId === jobId);
@@ -427,15 +430,6 @@ export class JobsController extends BaseController<Job> {
         isAccepted,
         isDenied
       };
-      // delete job.user.password;
-      // const jobApplied = await manager.query(
-      //   `SELECT * FROM applied_job WHERE "userId"='${user.users.id}' and "jobId" = '${id}'`,
-      // );
-
-      // if (jobApplied.length > 0) {
-      //   return { ...job, applied: true };
-      // }
-      // return { ...job, applied: false };
     } catch (error) {
       throw new HttpException(
         {
@@ -518,6 +512,7 @@ export class JobsController extends BaseController<Job> {
       throw new InternalServerErrorException('Incomplete CrudRequest');
     }
   }
+  
   @Override('updateOneBase')
   async restore(@ParsedRequest() req: CrudRequest): Promise<void> {
     const id = req.parsed.paramsFilter.find(

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../entity/user.entity';
-import { DeepPartial, getManager, Repository } from 'typeorm';
+import { getManager, Repository } from 'typeorm';
 import { Role } from 'src/entity/role.entity';
 import { UserRepository } from 'src/App/users/user.repository';
 import * as bcrypt from 'bcrypt';
@@ -19,10 +19,8 @@ import {
   RegisterDTO,
   ChangePwdDTO,
   EmployersDTO,
-  UploadCV,
   UpdatePhoneNumber,
   UploadAvatar,
-  UpdateAddress,
 } from './auth.dto';
 import { sign } from 'jsonwebtoken';
 import { Payload } from 'src/types/payload';
@@ -248,22 +246,6 @@ export class AuthServices {
       { password: await bcrypt.hash(body.password, 12) },
     );
     return { status: true };
-  }
-
-  async uploadCV(dto: UploadCV, userId: string) {
-    try {
-      const user = await this.userRepository.findOne({
-        where: { id: userId },
-        relations: ['profile'],
-      });
-      await this.profileRepository.update(
-        { id: user.profile.id },
-        { cvURL: dto.cvUrl },
-      );
-      return { success: true };
-    } catch (err) {
-      throw new InternalServerErrorException('Server Error');
-    }
   }
 
   async uploadAvatar(userId: string, dto: UploadAvatar) {

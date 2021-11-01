@@ -11,7 +11,7 @@ export class CV {
     @Column()
     name: string;
 
-    @Column()
+    @Column({type: 'nvarchar', length: 'MAX'})
     cvURL: string;
 
     @ManyToOne(() => Profile, profile => profile.cvs)

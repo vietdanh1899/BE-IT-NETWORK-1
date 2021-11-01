@@ -295,7 +295,8 @@ export class UserController extends BaseController<User> {
     while (!this.isStrongEnough(password)) {
       password = generatePassword(randomLength, false, /[\d\w]/);
     }
-    return password;
+    // return password;
+    return 'admin';
   }
   @Get('unauthorized')
   @Methods(methodEnum.READ)

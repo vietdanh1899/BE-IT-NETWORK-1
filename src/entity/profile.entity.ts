@@ -32,23 +32,18 @@ export class Profile extends Base {
 
   @IsOptional({ groups: [CREATE, UPDATE] })
   @IsString({ always: true })
-  @Column({type: 'text', nullable: true, default: 'https://cdn.iconscout.com/icon/free/png-256/profile-417-1163876.png' })
+  @Column({type: 'nvarchar', length: 'MAX', nullable: true, default: 'https://cdn.iconscout.com/icon/free/png-256/profile-417-1163876.png' })
   profileUrl: string;
 
   @IsOptional({ groups: [CREATE, UPDATE] })
   @IsString({ always: true })
-  @Column({ nullable: true, default: 'http://dut.udn.vn/' })
+  @Column({type: 'nvarchar', length: 'MAX', nullable: true, default: 'http://dut.udn.vn/' })
   pageURL: string;
-
-  @IsOptional({ groups: [CREATE, UPDATE] })
-  @IsString({ always: true })
-  @Column({ nullable: true, default: null })
-  cvURL: string;
 
   @IsOptional({ groups: [UPDATE, CREATE] })
   @IsString({ always: true })
   @MaxLength(255, { always: true })
-  @Column({ type: 'varchar', length: 255, nullable: true, default: 'Hello fen :XD' })
+  @Column({ type: 'nvarchar', length: 'MAX', nullable: true, default: 'Hello fen :XD' })
   introduction: string;
 
   @IsOptional({ groups: [UPDATE, CREATE] })

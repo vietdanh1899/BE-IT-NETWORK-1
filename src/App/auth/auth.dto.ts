@@ -100,14 +100,6 @@ export class ChangePwdDTO {
   confirmPassword: string;
 }
 
-export class UploadCV {
-  @ApiProperty({
-    example: 'http://test.com',
-  })
-  @IsString()
-  cvUrl: string;
-}
-
 export class UploadAvatar {
   @ApiProperty({
     example: '/images/abc.jpg',

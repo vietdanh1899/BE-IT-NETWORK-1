@@ -29,18 +29,8 @@ import {
     // author: User;
   
     @ManyToMany(
-      type => Job,
+      () => Job,
       job => job.tags,
     )
-    @JoinTable({
-      joinColumn: {
-        name: 'tagId',
-        referencedColumnName: 'id',
-      },
-      inverseJoinColumn: {
-        name: 'jobId',
-        referencedColumnName: 'id',
-      },
-    })
     jobs: Job[];
   }
