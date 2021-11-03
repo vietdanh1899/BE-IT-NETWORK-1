@@ -92,10 +92,10 @@ import { Point } from 'models/route_guide_pb';
           'deletedat',
         ],
       },
-      categories: {
-        eager: true,
-        exclude: ['createdat', 'updatedat', 'deletedat', 'parentId'],
-      },
+      // categories: {
+      //   eager: true,
+      //   exclude: ['createdat', 'updatedat', 'deletedat', 'parentId'],
+      // },
       address: {
         eager: true,
         exclude: ['createdat', 'updatedat', 'deletedat'],
@@ -135,38 +135,39 @@ export class JobsController extends BaseController<Job> {
   @Override('getManyBase')
   async getMany(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: Job) {
     try {
-      const favorite = await this.service.getAllFavoriteJob();
+      // const favorite = await this.service.getAllFavoriteJob();
       // const allJob = await this.base.getManyBase(req);
       // for (let i = 0; i < count(allJob); i++)
       console.log(JSON.stringify(req));
       const response: any = await this.base.getManyBase(req);
 
-      let isFavorite: Array<any>;
+      // let isFavorite: Array<any>;
 
-      if (response.count) {
-        isFavorite = response.data.map(job => {
-          // console.log('job', job);
+      // if (response.count) {
+      //   isFavorite = response.data.map(job => {
+      //     // console.log('job', job);
 
-          if (_.find(favorite, { jobId: job.id })) {
-            job.isFavorite = true;
-          } else {
-            job.isFavorite = false;
-          }
-          return job;
-        });
-        return { ...response, data: isFavorite };
-      } else {
-        isFavorite = response.map(job => {
-          // console.log(_.find(favorite, { jobId: job.id }));
-          if (_.find(favorite, { jobId: job.id })) {
-            job.isFavorite = true;
-          } else {
-            job.isFavorite = false;
-          }
-          return job;
-        });
-      }
-      return isFavorite;
+      //     if (_.find(favorite, { jobId: job.id })) {
+      //       job.isFavorite = true;
+      //     } else {
+      //       job.isFavorite = false;
+      //     }
+      //     return job;
+      //   });
+      //   return { ...response, data: isFavorite };
+      // } else {
+      //   isFavorite = response.map(job => {
+      //     // console.log(_.find(favorite, { jobId: job.id }));
+      //     if (_.find(favorite, { jobId: job.id })) {
+      //       job.isFavorite = true;
+      //     } else {
+      //       job.isFavorite = false;
+      //     }
+      //     return job;
+      //   });
+      // }
+      // return isFavorite;
+      return response
     } catch (error) {
       throw new InternalServerErrorException('Internal Server Error');
     }
@@ -513,7 +514,7 @@ export class JobsController extends BaseController<Job> {
       throw new InternalServerErrorException('Incomplete CrudRequest');
     }
   }
-  
+
   @Override('updateOneBase')
   async restore(@ParsedRequest() req: CrudRequest): Promise<void> {
     const id = req.parsed.paramsFilter.find(
@@ -609,14 +610,14 @@ export class JobsController extends BaseController<Job> {
     const requestParam = new Point();
     requestParam.setLatitude(409146138);
     requestParam.setLongitude(-746188906);
-    
+
 
     //Remote Procedure Call: Recommendation Server Python
     const sayHello = await clientService.sayHello(requestParam);
     console.log('--->say hello', sayHello.getLocation().getLatitude());
-    
-    
-      
+
+
+
     //ToDo: Get Item By Id 
   }
 

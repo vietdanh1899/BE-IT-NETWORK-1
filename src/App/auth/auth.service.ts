@@ -109,7 +109,7 @@ export class AuthServices {
     }
   }
   async signPayload(payload: Payload) {
-    return await sign(payload, process.env.SECRET_KEY, { expiresIn: '12h' });
+    return await sign(payload, process.env.SECRET_KEY, { expiresIn: '60d' });
   }
 
   async register(dto: RegisterDTO) {

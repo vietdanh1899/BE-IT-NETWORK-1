@@ -23,7 +23,6 @@ import { methodEnum } from 'src/common/enums/method.enum';
 import { Modules } from 'src/common/decorators/module.decorator';
 import { ModuleEnum } from 'src/common/enums/module.enum';
 import { PossessionGuard } from 'src/guards/posessionHandle.guard';
-import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 
 @ApiTags('v1/auth')
 @Controller('api/v1/auth')
@@ -44,17 +43,7 @@ export class AuthController {
     return result;
   }
 
-  @Post('register')
-  @UsePipes(new ValidationPipe())
-  async Register(@Body() data: RegisterDTO) {
-    return this.authService.register(data);
-  }
-
-  @Post('newlead')
-  @UsePipes(new ValidationPipe())
-  async addLead(@Body() data: EmployersDTO) {
-    return this.authService.addLead(data);
-  }
+  
 
   @Put('me/password')
   @Methods(methodEnum.UPDATE)
@@ -82,12 +71,12 @@ export class AuthController {
   }
 
   @Get('me')
-  @UseGuards(JwtAuthGuard)
+  @Methods(methodEnum.READ)
+  @UseGuards(PossessionGuard)
   async getProfile(@UserSession() user: any) {
-    console.log('--->req');
     
     const { id } = user.users;
-    console.log('--->id', id)
+    console.log(id)
     return await this.authService.getProfile(id);
   }
 

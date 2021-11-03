@@ -12,19 +12,17 @@ export class JobRepository extends BaseRepository<Job> {
      */
     constructor(private readonly connections: Connection) {
         super();
-        
+
     }
-    async getAllProfileItem()
-    {
+    async getAllProfileItem() {
         const manager = await getManager();
-        var result = await manager.query(`
+        const result = await manager.query(`
         SELECT jobs.id, tags.name  FROM dbo.jobs inner join job_tag on jobs.id = job_tag.jobId inner join tags on tags.id = job_tag.tagId`);
         return this.groupBy(result, x => x.id);
     }
 
-    async getAllCurrentTagsAsync()
-    {
-        return this.connections.getRepository(Tag).find({select: ['id', 'name']});
+    async getAllCurrentTagsAsync() {
+        return this.connections.getRepository(Tag).find({ select: ['id', 'name'] });
     }
 
     private groupBy(list, keyGetter) {
@@ -33,12 +31,12 @@ export class JobRepository extends BaseRepository<Job> {
             const key = keyGetter(item);
             const collection = map.get(key);
 
-            if(!collection) {
+            if (!collection) {
                 map.set(key, [item.name])
             } else {
                 collection.push(item.name);
             }
         });
-        return Array.from(map, ([name, value]) => ({name, value}));
-    }    
+        return Array.from(map, ([name, value]) => ({ name, value }));
+    }
 }
