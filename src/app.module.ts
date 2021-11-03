@@ -22,9 +22,9 @@ import { join } from 'path';
 
 @Module({
   imports: [
-    // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '..', 'uploads'),
-    // }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+    }),
     ConfigModule.forRoot(),
     UsersModule,
     CategoriesModule,
@@ -40,7 +40,7 @@ import { join } from 'path';
       dest: './uploads',
     }),
   ],
-  controllers: [ ApplyController],
+  controllers: [ApplyController],
   providers: [
     {
       provide: APP_FILTER,
