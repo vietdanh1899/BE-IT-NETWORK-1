@@ -28,6 +28,7 @@ import { Exclude } from 'class-transformer';
 import { AppliedJob } from './applied_job.entity';
 import { JobToCv } from './jobtocv.entity';
 import { Tag } from './tag.entity';
+import { JobRecently } from './job_recently.entity';
 
 const { CREATE, UPDATE } = CrudValidationGroups;
 @Entity('jobs')
@@ -187,22 +188,10 @@ export class Job extends Base {
   /**
    * Recently Job
    */
-  @ManyToMany(
-    type => User,
-    user => user.recentlyJob,
-  )
-  @JoinTable({
-    name: 'job_recently',
-    joinColumn: {
-      name: 'jobId',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'userId',
-      referencedColumnName: 'id',
-    },
-  })
-  recentlyUser: User[];
+  @OneToMany(type => JobRecently,
+    j => j.job
+    )
+    recently: JobRecently[];
 
   @OneToMany(() => JobToCv, jobToCv => jobToCv.job)
   public jobToCvs!: JobToCv[];

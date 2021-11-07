@@ -404,13 +404,11 @@ export class JobsController extends BaseController<Job> {
         relations: ['user', 'user.profile', 'categories', 'address', 'tags'],
       });
       const jobId = id;
-      console.log(user)
       const userId = user?.id;
       let isFavorite = false;
       let isApplied = false;
       let isAccepted = false;
       let isDenied = false;
-      console.log(userId)
       if (userId) {
         this.service.updateRecently(userId, id);
         const applied = await this.service.getAllAppliedJob(userId);

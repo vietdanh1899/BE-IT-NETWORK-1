@@ -19,18 +19,6 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   await app.listen(port);
   Logger.log(`Server running on htttp://localhost:${port}`);
-  const jobService = app.get(JobService);
-  const items = await jobService.getAllItemProfile();
-  console.log('--->items', items);
-  
-  const tags = await jobService.getAllCurrentTags();
-
-  const filterArr = _.map(items, o => {
-    o.value = tags.map(x => o.value.indexOf(x.name) > -1 ? 1 : 0);
-    return o;
-  });
-
-  // console.log('--->filterArr', filterArr);
   
 }
 
