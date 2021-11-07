@@ -34,6 +34,7 @@ import { Category } from './category.entity';
 import { Job } from './job.entity';
 import { AppliedJob } from './applied_job.entity';
 import RoleId from 'src/types/RoleId';
+import { JobRecently } from './job_recently.entity';
 const { CREATE, UPDATE } = CrudValidationGroups;
 
 @Entity('users')
@@ -173,12 +174,10 @@ export class User extends Base {
   /**
    * Recently Job
    */
-  @ManyToMany(
-    type => Job,
-    job => job.recentlyUser,
-  )
-  recentlyJob: Job[];
-
+  @OneToMany(type => JobRecently,
+    j => j.user
+    )
+    recently: JobRecently[]
   /**
    * Exec Hash Function before Insert
    */
