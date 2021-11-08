@@ -29,6 +29,7 @@ import { AppliedJob } from './applied_job.entity';
 import { JobToCv } from './jobtocv.entity';
 import { Tag } from './tag.entity';
 import { JobRecently } from './job_recently.entity';
+import { JobFavorite } from './job_favorite.entity';
 
 const { CREATE, UPDATE } = CrudValidationGroups;
 @Entity('jobs')
@@ -161,24 +162,6 @@ export class Job extends Base {
   /**
    * Favorites Job
    */
-
-  @ManyToMany(
-    type => User,
-    user => user.favorites,
-  )
-  @JoinTable({
-    name: 'job_favorite',
-    joinColumn: {
-      name: 'jobId',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'userId',
-      referencedColumnName: 'id',
-    },
-  })
-  favoriteBy: User[];
-
   @OneToMany(
     type => AppliedJob,
     appliedJob => appliedJob.job,
@@ -192,6 +175,11 @@ export class Job extends Base {
     j => j.job
     )
     recently: JobRecently[];
+   
+    @OneToMany(type => JobFavorite,
+      j => j.job
+    )
+    favoriteBy: JobFavorite[];
 
   @OneToMany(() => JobToCv, jobToCv => jobToCv.job)
   public jobToCvs!: JobToCv[];

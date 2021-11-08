@@ -22,15 +22,13 @@ import { User } from 'src/entity/user.entity';
 import { JobToCv } from 'src/entity/jobtocv.entity';
 import { isUUID } from 'class-validator';
 import RoleId from 'src/types/RoleId';
-import { JobRecently } from 'src/entity/job_recently.entity';
-import { timeStamp } from 'console';
-
+import { JobFavorite } from 'src/entity/job_favorite.entity';
 @Injectable()
 export class JobService extends TypeOrmCrudService<Job> {
   private tableName = 'job_favorite ';
   private job_applied = 'applied_job';
   private readonly manager = getManager();
-
+  
   constructor(
     @InjectRepository(Job) repo,
     private readonly repository: JobRepository,
@@ -43,7 +41,6 @@ export class JobService extends TypeOrmCrudService<Job> {
   }
 
   async addFavoritesJob(jobId: string, userId: string) {
-    const manager = getManager();
     const job = await this.repository.findOne({ where: { id: jobId } });
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!job) {
@@ -52,23 +49,26 @@ export class JobService extends TypeOrmCrudService<Job> {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
     try {
-      const favoritesByUser = await manager.query(
-        `SELECT * FROM ${this.tableName} WHERE "jobId"='${jobId}' and "userId"='${userId}'`,
-      );
-
-      if (favoritesByUser.length == 0) {
-        await manager.query(
-          `INSERT INTO ${this.tableName} values('${jobId}','${userId}')`,
-        );
-        return { status: true };
-      } else {
-        await manager.query(
-          `DELETE FROM ${this.tableName} WHERE "jobId"='${jobId}' and "userId"='${userId}'`,
-        );
-        return { status: false };
+      const entries = await getRepository(JobFavorite).findOne({where: {jobId: jobId, userId: userId}, withDeleted: true})
+      console.log('--->entries', entries);
+      
+      if (entries == null) {
+        const jobFavorite = new JobFavorite();
+        jobFavorite.userId = userId;
+        jobFavorite.jobId = jobId
+        await this.manager.save(jobFavorite);
+        return { isFavorite: true };
       }
+
+      if(entries.deletedat != null) {
+        entries.deletedat = null;
+        await this.manager.save(entries);
+        return { isFavorite: true }
+      } 
+      entries.deletedat = new Date()
+      await this.manager.save(entries);
+      return { isFavorite: false };
     } catch (error) {
       throw new InternalServerErrorException(
         `Internal Server Error Exception ${error}`,
@@ -84,7 +84,7 @@ export class JobService extends TypeOrmCrudService<Job> {
 
     const jobIds = favoritesJob.map(job => job.jobId);
     const jobByIds = await this.repository.findByIds(jobIds, {
-      relations: ['user', 'user.profile', 'categories'],
+      relations: ['user', 'user.profile', 'categories', 'address'],
     });
     return jobByIds.map(job => {
       delete job.user.password;
@@ -161,27 +161,42 @@ export class JobService extends TypeOrmCrudService<Job> {
   }
 
   async getJobAppliedByCompany(userId: string) {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
+    const user: User = await this.userRepository.findOne(userId, {
+      relations:
+        ["profile", "profile.cvs", "profile.cvs.jobToCvs", "profile.cvs.jobToCvs.job", "profile.cvs.jobToCvs.job.address",
+          "profile.cvs.jobToCvs.job.user", "profile.cvs.jobToCvs.job.user.profile"]
     });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    const manager = getManager();
-    const jobApplied = await manager.query(
-      `SELECT * FROM ${this.job_applied} WHERE "userId"='${userId}'`,
-    );
+    const jobs2d = user.profile.cvs.map(cv => cv.jobToCvs.map(jtc => {
+      return {
+        isAccepted: jtc.status,
+        isDenied: jtc.isDenied,
+        ...jtc.job,
+        user: { profile: jtc.job.user.profile },
+      }
+    }));
+    const jobs = [].concat(...jobs2d);
+    return jobs;
+    // const user = await this.userRepository.findOne({
+    //   where: { id: userId },
+    // });
+    // if (!user) {
+    //   throw new NotFoundException('User not found');
+    // }
+    // const manager = getManager();
+    // const jobApplied = await manager.query(
+    //   `SELECT * FROM ${this.job_applied} WHERE "userId"='${userId}'`,
+    // );
 
-    const jobIds = jobApplied.map(job => job.jobId);
-    const jobByIds = await this.repository.findByIds(jobIds, {
-      relations: ['user', 'user.profile', 'categories'],
-    });
-    return jobByIds.map(job => {
-      delete job.user.password;
-      delete job.user.ExpiredToken;
-      delete job.user.ExpiredToken;
-      return job;
-    });
+    // const jobIds = jobApplied.map(job => job.jobId);
+    // const jobByIds = await this.repository.findByIds(jobIds, {
+    //   relations: ['user', 'user.profile', 'categories'],
+    // });
+    // return jobByIds.map(job => {
+    //   delete job.user.password;
+    //   delete job.user.ExpiredToken;
+    //   delete job.user.ExpiredToken;
+    //   return job;
+    // });
   }
 
   async getListUserAppliedJob(contributorId: string) {
@@ -195,20 +210,20 @@ export class JobService extends TypeOrmCrudService<Job> {
 
     const allCompanyJob = await this.repository.find({
       where: { user: contributor },
-      relations: ['jobToCvs', 'jobToCvs.cv','jobToCvs.cv.profile','jobToCvs.cv.profile.user','jobToCvs.cv.profile.user.profile'],
+      relations: ['jobToCvs', 'jobToCvs.cv', 'jobToCvs.cv.profile', 'jobToCvs.cv.profile.user', 'jobToCvs.cv.profile.user.profile'],
     });
     const valuereturn = allCompanyJob.map(job => {
-        const applieduser = job.jobToCvs.map((jtc) => {
-          // console.log('co jtc',jtc);
-          return {
-            createdat: jtc.createdat,
-            cvId: jtc.cv.id,
-            cvURL: jtc.cv.cvURL,
-            user: jtc.cv.profile.user,
-            status: jtc.status,
-            isDenied: jtc.isDenied
-          };
-        });
+      const applieduser = job.jobToCvs.map((jtc) => {
+        // console.log('co jtc',jtc);
+        return {
+          createdat: jtc.createdat,
+          cvId: jtc.cv.id,
+          cvURL: jtc.cv.cvURL,
+          user: jtc.cv.profile.user,
+          status: jtc.status,
+          isDenied: jtc.isDenied
+        };
+      });
       return {
         ...job,
         appliedBy: applieduser
@@ -234,17 +249,17 @@ export class JobService extends TypeOrmCrudService<Job> {
       );
       if (jobApplied.length > 0) {
         await manager.query(
-          `UPDATE ${this.job_applied} set "status"= true WHERE "userId"='${userId}' AND "jobId"='${jobId}'`,
+          `UPDATE ${this.job_applied} set "status"= 'true' WHERE "userId"='${userId}' AND "jobId"='${jobId}'`,
         );
         {
-          const user: User = await getRepository(User).findOne(userId, {relations: ["profile", "profile.cvs"]});
+          const user: User = await getRepository(User).findOne(userId, { relations: ["profile", "profile.cvs"] });
           const cvs = user.profile.cvs;
           if (!cvs.length) return null;
-          const sjobToCv = await getRepository(JobToCv).find({jobId: jobId,cvId: In(cvs.map((cv) => cv.id))});
+          const sjobToCv = await getRepository(JobToCv).find({ jobId: jobId, cvId: In(cvs.map((cv) => cv.id)) });
           sjobToCv.forEach(jobToCV => {
             console.log(jobToCV);
             manager.query(
-              `UPDATE "job_to_cv" set "status"= true, "isDenied"=false WHERE "jobToCvId"='${jobToCV.jobToCvId}'`
+              `UPDATE "job_to_cv" set "status"= 'true', "isDenied"='false' WHERE "jobToCvId"='${jobToCV.jobToCvId}'`
             );
           })
         }
@@ -261,7 +276,7 @@ export class JobService extends TypeOrmCrudService<Job> {
     try {
       const findJob = await this.repository.find({
         where: { id: id },
-        relations: ['jobToCvs', 'jobToCvs.cv','jobToCvs.cv.profile','jobToCvs.cv.profile.user','jobToCvs.cv.profile.user.profile'],
+        relations: ['jobToCvs', 'jobToCvs.cv', 'jobToCvs.cv.profile', 'jobToCvs.cv.profile.user', 'jobToCvs.cv.profile.user.profile'],
       });
 
       if (!findJob) {
@@ -285,7 +300,7 @@ export class JobService extends TypeOrmCrudService<Job> {
         };
       })
       return valuereturn;
-        
+
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -316,30 +331,31 @@ export class JobService extends TypeOrmCrudService<Job> {
   }
   async getAllAppliedJob(userId: string) {
     if (!isUUID(userId)) return [];
-    const user: User = await getRepository(User).findOne(userId, {relations: ["profile", "profile.cvs"]});
+    const user: User = await getRepository(User).findOne(userId, { relations: ["profile", "profile.cvs"] });
     const cvs = user.profile.cvs;
     if (!cvs.length) return [];
-    else return await getRepository(JobToCv).find({cvId: In(cvs.map((cv) => cv.id))});
+    else return await getRepository(JobToCv).find({ cvId: In(cvs.map((cv) => cv.id)) });
   }
 
   async updateRecently(userId: string, jobId: string) {
-    try {
-      const entries = await getRepository(JobRecently).findOne({where: {jobId: jobId, userId: userId}})
-      
-      if(!entries) {
-        
-        const jobRecently = new JobRecently();
-        jobRecently.jobId = jobId;
-        jobRecently.userId = userId
-        jobRecently.count = 1;
-        await this.manager.save(jobRecently);
-      } else {
-        entries.count +=1 ;
-        await this.manager.save(entries);
-      }
-    } catch(err) {
-      throw new InternalServerErrorException('Internal Server Error');
+    const manager = getManager();
+    const findRecently = await manager.query(
+      `SELECT * FROM job_recently where "userId" = '${userId}' and "jobId" = '${jobId}'`,
+    );
+
+    if (findRecently.length == 0) {
+      await manager.query(
+        `INSERT INTO job_recently VALUES ('${jobId}', '${userId}')`,
+      );
     }
+    // const recentlyJobByUser = await manager.query(
+    //   `SELECT * FROM job_recently where "userId" = '${userId}'`,
+    // );
+    // if (recentlyJobByUser.length > 10) {
+    //   await manager.query(
+    //     `DELETE FROM job_recently where userId = '${recentlyJobByUser[0].userId}' and jobId = '${recentlyJobByUser[0].jobId}'`,
+    //   );
+    // }
   }
 
   async getAllAcceptedUser(id: string) {
@@ -379,13 +395,11 @@ export class JobService extends TypeOrmCrudService<Job> {
     }
   }
 
-  async getAllItemProfile()
-  {
+  async getAllItemProfile() {
     return this.repository.getAllProfileItem();
   }
-  
-  async getAllCurrentTags()
-  {
+
+  async getAllCurrentTags() {
     return this.repository.getAllCurrentTagsAsync();
   }
 }
