@@ -35,6 +35,7 @@ import { Job } from './job.entity';
 import { AppliedJob } from './applied_job.entity';
 import RoleId from 'src/types/RoleId';
 import { JobRecently } from './job_recently.entity';
+import { JobFavorite } from './job_favorite.entity';
 const { CREATE, UPDATE } = CrudValidationGroups;
 
 @Entity('users')
@@ -153,15 +154,6 @@ export class User extends Base {
   jobs: Job[];
 
   /**
-   * A user can have many favorites books
-   */
-  @ManyToMany(
-    type => Job,
-    job => job.favoriteBy,
-  )
-  favorites: Job[];
-
-  /**
    * A user can apply many jobs
    */
 
@@ -175,9 +167,14 @@ export class User extends Base {
    * Recently Job
    */
   @OneToMany(type => JobRecently,
-    j => j.user
+    j => j.user,
     )
     recently: JobRecently[]
+
+  @OneToMany(type => JobFavorite,
+    j => j.user
+    )
+    favorite: JobFavorite[]
   /**
    * Exec Hash Function before Insert
    */
