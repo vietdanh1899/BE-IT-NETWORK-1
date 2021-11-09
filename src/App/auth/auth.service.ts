@@ -42,7 +42,7 @@ export class AuthServices {
     private readonly profileRepository: Repository<Profile>,
     @InjectRepository(Job)
     private readonly jobRepository: Repository<Job>,
-  ) {}
+  ) { }
 
   async getRolesPermission(role: string) {
     try {
@@ -104,7 +104,7 @@ export class AuthServices {
       };
     } catch (error) {
       console.log('-->err', error);
-      
+
       throw error;
     }
   }
@@ -285,11 +285,11 @@ export class AuthServices {
   async getRecently(id: string) {
     try {
       const manager = getManager();
-      console.log(id)
+      // console.log(id)
       const jobRecently = await manager.query(
         `SELECT "jobId" FROM ${this.job_recently} WHERE "userId"='${id}'`,
       );
-      console.log(jobRecently)
+      // console.log(jobRecently)
       const jobId = jobRecently.map(job => {
         return job.jobId;
       });
@@ -298,7 +298,7 @@ export class AuthServices {
         where: {},
         relations: ['user', 'user.profile', 'categories', 'address'],
       });
-      console.log('jobs', jobs)
+      // console.log('jobs', jobs)
       return jobs.map(job => {
         delete job.user.password;
         return job;

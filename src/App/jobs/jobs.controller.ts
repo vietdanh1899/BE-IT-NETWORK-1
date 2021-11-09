@@ -414,7 +414,8 @@ export class JobsController extends BaseController<Job> {
         const applied = await this.service.getAllAppliedJob(userId);
         const favorite = await this.service.getAllFavoriteJobByUserId(userId);
         isApplied = applied.some(_jobToCv => _jobToCv.jobId === jobId);
-        isFavorite = favorite.some(_jobFavorite => _jobFavorite.jobId === jobId);
+        console.log('->>>> favorite ', favorite);
+        isFavorite = favorite.some(_jobFavorite => (_jobFavorite.jobId === jobId) && (!_jobFavorite.deletedat));
         const user: User = await getRepository(User).findOne(userId, { relations: ["profile", "profile.cvs"] });
         const cvs = user.profile.cvs;
         if (cvs.length) {

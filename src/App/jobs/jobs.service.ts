@@ -23,12 +23,13 @@ import { JobToCv } from 'src/entity/jobtocv.entity';
 import { isUUID } from 'class-validator';
 import RoleId from 'src/types/RoleId';
 import { JobFavorite } from 'src/entity/job_favorite.entity';
+import { JobRecently } from 'src/entity/job_recently.entity';
 @Injectable()
 export class JobService extends TypeOrmCrudService<Job> {
   private tableName = 'job_favorite ';
   private job_applied = 'applied_job';
   private readonly manager = getManager();
-  
+
   constructor(
     @InjectRepository(Job) repo,
     private readonly repository: JobRepository,
@@ -50,9 +51,9 @@ export class JobService extends TypeOrmCrudService<Job> {
       throw new NotFoundException('User not found');
     }
     try {
-      const entries = await getRepository(JobFavorite).findOne({where: {jobId: jobId, userId: userId}, withDeleted: true})
+      const entries = await getRepository(JobFavorite).findOne({ where: { jobId: jobId, userId: userId }, withDeleted: true })
       console.log('--->entries', entries);
-      
+
       if (entries == null) {
         const jobFavorite = new JobFavorite();
         jobFavorite.userId = userId;
@@ -61,11 +62,11 @@ export class JobService extends TypeOrmCrudService<Job> {
         return { isFavorite: true };
       }
 
-      if(entries.deletedat != null) {
+      if (entries.deletedat != null) {
         entries.deletedat = null;
         await this.manager.save(entries);
         return { isFavorite: true }
-      } 
+      }
       entries.deletedat = new Date()
       await this.manager.save(entries);
       return { isFavorite: false };
@@ -79,7 +80,7 @@ export class JobService extends TypeOrmCrudService<Job> {
   async getFavoritesByUser(userId: string) {
     const manager = getManager();
     const favoritesJob = await manager.query(
-      `SELECT * FROM ${this.tableName} WHERE "userId"='${userId}'`,
+      `SELECT * FROM ${this.tableName} WHERE "userId"='${userId}' AND "deletedat" IS NULL`,
     );
 
     const jobIds = favoritesJob.map(job => job.jobId);
@@ -323,9 +324,10 @@ export class JobService extends TypeOrmCrudService<Job> {
   async getAllFavoriteJobByUserId(userId: string) {
     if (!isUUID(userId)) return [];
     const manager = getManager();
-    const jobFavorite = await manager.query(
-      `SELECT distinct("jobId") FROM ${this.tableName} WHERE "userId"='${userId}'`
-    );
+    // const jobFavorite = await manager.query(
+    //   `SELECT distinct("jobId"), * FROM ${this.tableName} WHERE "userId"='${userId}'`
+    // );
+    const jobFavorite = getRepository(JobFavorite).find({ userId: userId });
     if (!jobFavorite) return [];
     else return jobFavorite;
   }
@@ -339,15 +341,27 @@ export class JobService extends TypeOrmCrudService<Job> {
 
   async updateRecently(userId: string, jobId: string) {
     const manager = getManager();
-    const findRecently = await manager.query(
-      `SELECT * FROM job_recently where "userId" = '${userId}' and "jobId" = '${jobId}'`,
-    );
-
-    if (findRecently.length == 0) {
-      await manager.query(
-        `INSERT INTO job_recently VALUES ('${jobId}', '${userId}')`,
-      );
+    // const findRecently = await manager.query(
+    //   `SELECT * FROM job_recently where "userId" = '${userId}' and "jobId" = '${jobId}'`,
+    // );
+    const findRecently = await getRepository(JobRecently).findOne({ userId: userId, jobId: jobId });
+    console.log('->>>>>>> recently', findRecently);
+    if (!findRecently) {
+      const newJobRecently = new JobRecently();
+      newJobRecently.jobId = jobId;
+      newJobRecently.userId = userId;
+      newJobRecently.count = 1;
+      return await manager.save(newJobRecently);
     }
+    else {
+      findRecently.count++;
+      return await manager.save(findRecently);
+    }
+    // if (findRecently.length == 0) {
+    //   await manager.query(
+    //     `INSERT INTO job_recently VALUES ('${jobId}', '${userId}')`,
+    //   );
+    // }
     // const recentlyJobByUser = await manager.query(
     //   `SELECT * FROM job_recently where "userId" = '${userId}'`,
     // );
