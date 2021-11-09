@@ -14,10 +14,13 @@ module.exports = [
     extra: {
       trustServerCertificate: true,
     },
+    migrationsTableName: 'custom_migration_table',
+    migrations: ['src/database/migrations/*{.ts,.js}'],
     entities: ['src/**/*.entity{.ts,.js}'],
     seeds: ['src/database/seeds/**/*.seed{.ts,.js}'],
     factories: ['src/database/factories/**/*.factory{.ts,.js}'],
-    // seeds: ['src/database/seeds/04-category.seed.ts'],
-    // factories: ['src/database/factories/category.factory.ts'],
+    cli: {
+      'migrationsDir': 'src/database/migrations'
+    }
   },
 ];

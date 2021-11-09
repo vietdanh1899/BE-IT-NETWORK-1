@@ -1,6 +1,6 @@
-CREATE OR ALTER TRIGGER trigger_favorite
+CREATE OR ALTER TRIGGER trigger_recently
 ON [dbo].[job_recently]
-FOR UPDATE 
+FOR UPDATE, INSERT
 AS 
 BEGIN
 DECLARE @jobId varchar(256)

@@ -1,4 +1,4 @@
-CREATE OR ALTER TRIGGER trigger_favorite
+CREATE OR ALTER TRIGGER trigger_favorite_delete
 ON [dbo].[job_favorite]
 FOR DELETE 
 AS 
