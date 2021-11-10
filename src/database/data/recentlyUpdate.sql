@@ -20,7 +20,16 @@ BEGIN TRY
 			DECLARE @count int 
 			DECLARE @duedate int
 			SELECT @count = count, @duedate = DATEDIFF(day, updatedat, GETDATE()) FROM job_recently where userId = @userId AND jobId = @jobId
-			IF (@count = 1 and @duedate > 5) --Check if the period between current day and recently is higher than 5 day 
+			IF(@count = 1)
+			BEGIN
+				IF (EXISTS(SELECT TOP 1 id from [dbo].[user_rating] where userId = @userId AND jobId = @jobId))
+				RETURN
+				ELSE 
+				BEGIN
+				  INSERT INTO [dbo].[user_rating](userId, jobId, rating) values (@userId, @jobId, 3)
+				END
+			END
+			IF (@count = 2 and @duedate > 5) --Check if the period between current day and recently is higher than 5 day 
 			BEGIN
 				IF (EXISTS(SELECT TOP 1 id from [dbo].[user_rating] where userId = @userId AND jobId = @jobId))
 				BEGIN
@@ -43,6 +52,7 @@ BEGIN TRY
 	COMMIT
 END TRY
 BEGIN CATCH
+ PRINT N'ROLL BACK.';  
 ROLLBACK TRANSACTION
 END CATCH
 END
