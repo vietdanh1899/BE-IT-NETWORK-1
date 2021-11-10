@@ -442,6 +442,53 @@ export class JobsController extends BaseController<Job> {
     }
   }
 
+  @Get('getOne/:id')
+  @ApiBearerAuth()
+  async getOneJobDetail(@Param('id') id: string, @UserDecorator() user) {
+    try {
+      const job = await this.repository.findOne({
+        where: { id },
+        relations: ['user', 'user.profile', 'categories', 'address', 'tags'],
+      });
+      const jobId = id;
+      const userId = user?.id;
+      let isFavorite = false;
+      let isApplied = false;
+      let isAccepted = false;
+      let isDenied = false;
+      if (userId) {
+        // this.service.updateRecently(userId, id);
+        const applied = await this.service.getAllAppliedJob(userId);
+        const favorite = await this.service.getAllFavoriteJobByUserId(userId);
+        isApplied = applied.some(_jobToCv => _jobToCv.jobId === jobId);
+        console.log('->>>> favorite ', favorite);
+        isFavorite = favorite.some(_jobFavorite => (_jobFavorite.jobId === jobId) && (!_jobFavorite.deletedat));
+        const user: User = await getRepository(User).findOne(userId, { relations: ["profile", "profile.cvs"] });
+        const cvs = user.profile.cvs;
+        if (cvs.length) {
+          const sjobToCv = await getRepository(JobToCv).find({ jobId: jobId, cvId: In(cvs.map((cv) => cv.id)) });
+          isAccepted = sjobToCv.some((jtc) => jtc.status == true);
+          isDenied = !sjobToCv.every((jtc) => jtc.isDenied == false);
+        }
+      }
+      return {
+        ...job,
+        isApplied,
+        isFavorite,
+        isAccepted,
+        isDenied
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: 'Job not found',
+          error: HttpStatus.NOT_FOUND,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
   @Put('updateOne/:id')
   async updateUser(@Body() dto: Partial<Job>, @Param('id') id: string) {
     try {

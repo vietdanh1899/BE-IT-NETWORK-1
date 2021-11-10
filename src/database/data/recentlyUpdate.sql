@@ -10,7 +10,6 @@ SELECT @userId = inserted.userId FROM inserted
 SELECT @jobId = inserted.jobId FROM inserted
 BEGIN
 BEGIN TRY 
-	BEGIN TRANSACTION
 		IF (EXISTS (SELECT TOP 1 index_name FROM [dbo].[applied_job] WHERE userId = @userId AND jobId = @jobId)
 		OR EXISTS (SELECT TOP 1 * FROM [dbo].[job_favorite] WHERE userId = @userId AND jobId = @jobId)
 		)
@@ -49,7 +48,6 @@ BEGIN TRY
 				UPDATE [dbo].[user_rating] set rating = 4 where userId = @userId AND jobId = @jobId
 			END
 		END
-	COMMIT
 END TRY
 BEGIN CATCH
  PRINT N'ROLL BACK.';  

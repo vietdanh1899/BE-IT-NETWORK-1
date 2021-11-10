@@ -12,7 +12,6 @@ SELECT @jobId = inserted.jobId FROM INSERTED
 SELECT @date = inserted.deletedat FROM INSERTED
 BEGIN
 BEGIN TRY 
-	BEGIN TRANSACTION
 		IF EXISTS (SELECT TOP 1 index_name FROM [dbo].[applied_job] WHERE userId = @userId AND jobId = @jobId)
 		RETURN
 		IF EXISTS (SELECT TOP 1 ID FROM [dbo].[user_rating] where userId = @userId and jobId = @jobId)
@@ -33,10 +32,8 @@ BEGIN TRY
 			ELSE
 				INSERT INTO [dbo].[user_rating](jobId, userId, rating) VALUES (@jobId, @userId, 1)
 		END
-	COMMIT
 END TRY
 BEGIN CATCH
-ROLLBACK TRANSACTION
 END CATCH
 END
 END
