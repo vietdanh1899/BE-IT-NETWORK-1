@@ -135,7 +135,7 @@ def mapData(item, l_tags):
 def serve():
     app = Flask(__name__)
 
-    engine = create_engine("mssql+pyodbc://root:admin@localhost:1433/CV_APP?driver=ODBC+Driver+17+for+SQL+Server")
+    engine = create_engine("mssql+pyodbc://danh:123456789@itnetwork.viewdns.net:1433/itnetwork?driver=ODBC+Driver+17+for+SQL+Server")
     with engine.connect() as connection:
         result = connection.execute(text("SELECT jobs.id, tags.name  FROM dbo.jobs inner join job_tag on jobs.id = job_tag.jobId inner join tags on tags.id = job_tag.tagId"))
         # print('type',)
@@ -158,13 +158,14 @@ def serve():
     # tfidf
     tfidf = ContentBase.getTfidf(X_train_counts)
     rate_train = getUserRatingMatrix(engine)
-    ids, scores = ContentBase.get_items_rated_by_user(rate_train, '743164BE-CB6C-4E67-9EF8-CC80ED8CFE18')
+    #ids, scores = ContentBase.get_items_rated_by_user(rate_train, '00E76341-7E3F-EC11-9EBB-D4258B0760D4')
     d = tfidf.shape[1]  # data dimension
     n_users = users.shape[0]
     W = np.zeros((d, n_users))
     b = np.zeros((1, n_users))
-    W, b = ContentBase.GetRidgeRegression(self=ContentBase, n_users = np.asarray(users), rate_train = rate_train,  tfidf = tfidf, W = W, b =b)
-    print('w', W)
+    W, b = ContentBase.GetRidgeRegression(self=ContentBase, n_users = np.asarray(users), rate_train = rate_train,  tfidf = tfidf, W = W, b =b, index_arr=a[:, 1])
+    Yhat = tfidf.dot(W) + b
+    print(Yhat[:, 18])
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     route_guide_pb2_grpc.add_RouteGuideServicer_to_server(
         RouteGuideServicer(), server)
