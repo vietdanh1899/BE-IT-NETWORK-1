@@ -1,16 +1,13 @@
 import { credentials, Metadata } from '@grpc/grpc-js';
 import { promisify } from 'util';
-
-import { RouteGuideClient } from 'models/route_guide_grpc_pb';
-import { Feature, Point } from 'models/route_guide_pb';
-
-
+import { RecommendationClient } from 'models/rs_grpc_pb';
+import { ItemResponse, UserRequest} from 'models/rs_pb';
 
 class ClientService {
-    private readonly client: RouteGuideClient = new RouteGuideClient('localhost:50051', credentials.createInsecure());
+    private readonly client: RecommendationClient = new RecommendationClient('localhost:50051', credentials.createInsecure());
   
-    public async sayHello(param: Point, metadata: Metadata = new Metadata()): Promise<Feature> {
-      return promisify<Point, Metadata, Feature>(this.client.getFeature.bind(this.client))(param, metadata);
+    public async getItemRecommended(param: UserRequest, metadata: Metadata = new Metadata()): Promise<ItemResponse> {
+      return promisify<UserRequest, Metadata, ItemResponse>(this.client.getItemRecommended.bind(this.client))(param, metadata);
     }
   }
   
