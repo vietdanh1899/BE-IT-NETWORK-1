@@ -23,7 +23,7 @@ class ContentBase:
 
   @staticmethod
   def getIndexInArr(index_arr, list_item):
-    return list(map((lambda x: np.where(index_arr == x)[0][0]), list_item[0]))
+    return list(map((lambda x: np.where(index_arr == x)[0][0]), list_item))
 
   @staticmethod #Find the model for each user
   def GetRidgeRegression(self, n_users, rate_train, tfidf, W, b, index_arr):
@@ -32,7 +32,7 @@ class ContentBase:
       i = np.where(n_users == n[0])[0][0]
       ids, scores = self.get_items_rated_by_user(rate_train, n[0])
       clf = Ridge(alpha=0.01, fit_intercept=True)
-      tests = self.getIndexInArr(index_arr, ids)
+      tests = self.getIndexInArr(index_arr, ids[0])
       Xhat = tfidf[tests, :]
       if Xhat.size != 0:
         clf.fit(Xhat, scores[0])
