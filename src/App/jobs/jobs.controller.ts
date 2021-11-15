@@ -660,15 +660,17 @@ export class JobsController extends BaseController<Job> {
     const limit = req.query.hasOwnProperty('limit') ? req.query.limit : 10;
     const page = req.query.hasOwnProperty('page') ? req.query.page : 1;
     const sort = req.query.hasOwnProperty('sort') ? req.query.sort : null;
+    
     const requestParam = new UserRequest();
-    requestParam.setId('00E76341-7E3F-EC11-9EBB-D4258B0760D4');
+    requestParam.setId(user.users.id);
     //Remote Procedure Call: Recommendation Server Python
     const itemIds = await clientService.getItemRecommended(requestParam);
+    
     return this.service.getItemBaseOnRS({limit, page, sort}, itemIds.getItemidsList());
     } catch(err) {
-        
+        console.log('-->err', err);
+        //ToDo: get job in normal mode
     }
-    //ToDo: Get Item By Id 
   }
 
   @Get('/tags/all')
