@@ -4,6 +4,7 @@ package Recommendation;
 
 service Recommendation {
     rpc GetItemRecommended(UserRequest) returns (ItemResponse) {};
+    rpc TrackChange(Check) returns (Check) {};
 }
 
 
