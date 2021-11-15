@@ -1,6 +1,6 @@
 import { take } from 'lodash';
 import { Interface } from 'readline';
-import { IsNull, Not, Repository } from 'typeorm';
+import { In, IsNull, Not, Repository } from 'typeorm';
 import { Pagination, PaginationOption } from '../Paginate';
 
 interface RelationType {

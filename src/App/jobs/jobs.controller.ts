@@ -651,13 +651,23 @@ export class JobsController extends BaseController<Job> {
     // return job;
   }
 
-  @Get('/item-profile/all')
-  async getItemProfile() {
+  @Get('/rs/all')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async getItemProfile(@Request() req, @UserSession() user) {
+    try {
+      console.log('->>user', user);
+    const limit = req.query.hasOwnProperty('limit') ? req.query.limit : 10;
+    const page = req.query.hasOwnProperty('page') ? req.query.page : 1;
+    const sort = req.query.hasOwnProperty('sort') ? req.query.sort : null;
     const requestParam = new UserRequest();
     requestParam.setId('00E76341-7E3F-EC11-9EBB-D4258B0760D4');
     //Remote Procedure Call: Recommendation Server Python
-    const items = await clientService.getItemRecommended(requestParam);
-    console.log('--->say hello', items.getItemidsList());
+    const itemIds = await clientService.getItemRecommended(requestParam);
+    return this.service.getItemBaseOnRS({limit, page, sort}, itemIds.getItemidsList());
+    } catch(err) {
+        
+    }
     //ToDo: Get Item By Id 
   }
 
