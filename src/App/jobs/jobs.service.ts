@@ -25,6 +25,8 @@ import RoleId from 'src/types/RoleId';
 import { JobFavorite } from 'src/entity/job_favorite.entity';
 import { JobRecently } from 'src/entity/job_recently.entity';
 import { PaginationOption } from 'src/common/Paginate';
+import { clientService } from 'src/grpc/route.service';
+import { Check } from 'models/rs_pb';
 @Injectable()
 export class JobService extends TypeOrmCrudService<Job> {
   private tableName = 'job_favorite ';
@@ -70,7 +72,12 @@ export class JobService extends TypeOrmCrudService<Job> {
       }
       entries.deletedat = new Date()
       await this.manager.save(entries);
-      return { isFavorite: false };
+    //Remote Procedure Call: Recommendation Server Python
+    const requestParam = new Check();
+    requestParam.setMessage('request');
+    const messsage = await clientService.trackChange(requestParam);
+    //Todo: check if message return 'Failed' call service again
+    return { isFavorite: false };
     } catch (error) {
       throw new InternalServerErrorException(
         `Internal Server Error Exception ${error}`,
@@ -115,6 +122,9 @@ export class JobService extends TypeOrmCrudService<Job> {
       if (jobApplied.length == 0) {
         const createJob = this.appliesJobRepo.create({ user, jobId });
         await this.appliesJobRepo.save(createJob);
+        const requestParam = new Check();
+        requestParam.setMessage('request');
+        const messsage = await clientService.trackChange(requestParam);
         return { status: true };
       } else {
         throw new ConflictException('Job has been already applied');
@@ -342,35 +352,23 @@ export class JobService extends TypeOrmCrudService<Job> {
 
   async updateRecently(userId: string, jobId: string) {
     const manager = getManager();
-    // const findRecently = await manager.query(
-    //   `SELECT * FROM job_recently where "userId" = '${userId}' and "jobId" = '${jobId}'`,
-    // );
     const findRecently = await getRepository(JobRecently).findOne({ userId: userId, jobId: jobId });
-    console.log('->>>>>>> recently', findRecently);
     if (!findRecently) {
       const newJobRecently = new JobRecently();
       newJobRecently.jobId = jobId;
       newJobRecently.userId = userId;
       newJobRecently.count = 1;
-      return await manager.save(newJobRecently);
+      await manager.save(newJobRecently);
     }
     else {
       findRecently.count++;
-      return await manager.save(findRecently);
+      await manager.save(findRecently);
     }
-    // if (findRecently.length == 0) {
-    //   await manager.query(
-    //     `INSERT INTO job_recently VALUES ('${jobId}', '${userId}')`,
-    //   );
-    // }
-    // const recentlyJobByUser = await manager.query(
-    //   `SELECT * FROM job_recently where "userId" = '${userId}'`,
-    // );
-    // if (recentlyJobByUser.length > 10) {
-    //   await manager.query(
-    //     `DELETE FROM job_recently where userId = '${recentlyJobByUser[0].userId}' and jobId = '${recentlyJobByUser[0].jobId}'`,
-    //   );
-    // }
+     //Remote Procedure Call: Recommendation Server Python
+     const requestParam = new Check();
+     requestParam.setMessage('request');
+     const messsage = await clientService.trackChange(requestParam);
+     //Todo: check if message return 'Failed' call service again
   }
 
   async getAllAcceptedUser(id: string) {

@@ -4,6 +4,17 @@
 var grpc = require('@grpc/grpc-js');
 var rs_pb = require('./rs_pb.js');
 
+function serialize_Recommendation_Check(arg) {
+  if (!(arg instanceof rs_pb.Check)) {
+    throw new Error('Expected argument of type Recommendation.Check');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_Recommendation_Check(buffer_arg) {
+  return rs_pb.Check.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_Recommendation_ItemResponse(arg) {
   if (!(arg instanceof rs_pb.ItemResponse)) {
     throw new Error('Expected argument of type Recommendation.ItemResponse');
@@ -38,6 +49,17 @@ var RecommendationService = exports.RecommendationService = {
     requestDeserialize: deserialize_Recommendation_UserRequest,
     responseSerialize: serialize_Recommendation_ItemResponse,
     responseDeserialize: deserialize_Recommendation_ItemResponse,
+  },
+  trackChange: {
+    path: '/Recommendation.Recommendation/TrackChange',
+    requestStream: false,
+    responseStream: false,
+    requestType: rs_pb.Check,
+    responseType: rs_pb.Check,
+    requestSerialize: serialize_Recommendation_Check,
+    requestDeserialize: deserialize_Recommendation_Check,
+    responseSerialize: serialize_Recommendation_Check,
+    responseDeserialize: deserialize_Recommendation_Check,
   },
 };
 

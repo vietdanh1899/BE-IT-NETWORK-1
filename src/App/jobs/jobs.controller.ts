@@ -410,7 +410,7 @@ export class JobsController extends BaseController<Job> {
       let isAccepted = false;
       let isDenied = false;
       if (userId) {
-        this.service.updateRecently(userId, id);
+        await this.service.updateRecently(userId, id);
         const applied = await this.service.getAllAppliedJob(userId);
         const favorite = await this.service.getAllFavoriteJobByUserId(userId);
         isApplied = applied.some(_jobToCv => _jobToCv.jobId === jobId);
