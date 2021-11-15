@@ -11,7 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { Job } from 'src/entity/job.entity';
 import { JobRepository } from './jobs.repository';
-import { getManager, getRepository, In } from 'typeorm';
+import { getManager, getRepository, In, IsNull, Not } from 'typeorm';
 import { UserRepository } from '../users/user.repository';
 import { CategoryRepository } from '../categories/categories.repository';
 import axios from 'axios';
@@ -24,6 +24,7 @@ import { isUUID } from 'class-validator';
 import RoleId from 'src/types/RoleId';
 import { JobFavorite } from 'src/entity/job_favorite.entity';
 import { JobRecently } from 'src/entity/job_recently.entity';
+import { PaginationOption } from 'src/common/Paginate';
 @Injectable()
 export class JobService extends TypeOrmCrudService<Job> {
   private tableName = 'job_favorite ';
@@ -388,6 +389,18 @@ export class JobService extends TypeOrmCrudService<Job> {
     } catch (err) {
       throw new InternalServerErrorException('Internal Server Error');
     }
+  }
+
+  async getItemBaseOnRS(req: PaginationOption, ids: Array<string>) {
+    const results: any = await this.repository.paginate(
+      {
+        limit: req.limit,
+        page: req.page,
+      },
+      { relations: [] },
+      { condition: {id: In(ids)}},
+    );
+    return results;      
   }
 
   async getAcceptedUserByJobId(id: string) {
