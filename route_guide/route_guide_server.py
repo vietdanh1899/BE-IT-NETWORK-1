@@ -33,6 +33,17 @@ class RecommendationServicer(rs_pb2_grpc.RecommendationServicer):
         self.users = users
         self.data = data
 
+    def TrackChange(self, request, context):
+        print('track change');
+        try:
+          yhat, users, data = InitDb()
+          self.yhat = yhat
+          self.users = users
+          self.data = data
+          return rs_pb2.Check(message='success')
+        except:
+          return rs_pb2.Check(message='failed')
+
     def GetItemRecommended(self, request, context):
         indexUserId = self.get_Index_user(request.id)
         itemIdsRated = self.yhat[:, indexUserId]
