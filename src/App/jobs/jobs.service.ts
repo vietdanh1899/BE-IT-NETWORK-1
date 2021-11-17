@@ -72,12 +72,12 @@ export class JobService extends TypeOrmCrudService<Job> {
       }
       entries.deletedat = new Date()
       await this.manager.save(entries);
-    //Remote Procedure Call: Recommendation Server Python
-    const requestParam = new Check();
-    requestParam.setMessage('request');
-    const messsage = await clientService.trackChange(requestParam);
-    //Todo: check if message return 'Failed' call service again
-    return { isFavorite: false };
+      //Remote Procedure Call: Recommendation Server Python
+      const requestParam = new Check();
+      requestParam.setMessage('request');
+      clientService.trackChange(requestParam);
+      //Todo: check if message return 'Failed' call service again
+      return { isFavorite: false };
     } catch (error) {
       throw new InternalServerErrorException(
         `Internal Server Error Exception ${error}`,
@@ -124,7 +124,7 @@ export class JobService extends TypeOrmCrudService<Job> {
         await this.appliesJobRepo.save(createJob);
         const requestParam = new Check();
         requestParam.setMessage('request');
-        const messsage = await clientService.trackChange(requestParam);
+        clientService.trackChange(requestParam);
         return { status: true };
       } else {
         throw new ConflictException('Job has been already applied');
@@ -364,11 +364,11 @@ export class JobService extends TypeOrmCrudService<Job> {
       findRecently.count++;
       await manager.save(findRecently);
     }
-     //Remote Procedure Call: Recommendation Server Python
-     const requestParam = new Check();
-     requestParam.setMessage('request');
-     const messsage = await clientService.trackChange(requestParam);
-     //Todo: check if message return 'Failed' call service again
+    //Remote Procedure Call: Recommendation Server Python
+    const requestParam = new Check();
+    requestParam.setMessage('request');
+    clientService.trackChange(requestParam);
+    //Todo: check if message return 'Failed' call service again
   }
 
   async getAllAcceptedUser(id: string) {
@@ -395,10 +395,10 @@ export class JobService extends TypeOrmCrudService<Job> {
         limit: req.limit,
         page: req.page,
       },
-      { relations: [] },
-      { condition: {id: In(ids)}},
+      { relations: ['user', 'user.profile', 'user.address'] },
+      { condition: { id: In(ids) } },
     );
-    return results;      
+    return results;
   }
 
   async getAcceptedUserByJobId(id: string) {

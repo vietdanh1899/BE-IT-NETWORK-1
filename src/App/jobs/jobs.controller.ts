@@ -45,16 +45,6 @@ import { getDistance } from 'geolib';
 import { JobToCv } from 'src/entity/jobtocv.entity';
 import { clientService } from 'src/grpc/route.service';
 import { UserRequest } from 'models/rs_pb';
-// @Controller('api/v2/jobs')
-// export class JobControllerV2 {
-//   @Get('/:jobId')
-//   async getJob(@Param('jobId') jobId: string) {
-//     console.log(jobId);
-//     const job = await getRepository(Job).findOne(jobId);
-//     console.log(job);
-//     return job;
-//   }
-// }
 
 @Crud({
   model: {
@@ -657,19 +647,19 @@ export class JobsController extends BaseController<Job> {
   async getItemProfile(@Request() req, @UserSession() user) {
     try {
       console.log('->>user', user);
-    const limit = req.query.hasOwnProperty('limit') ? req.query.limit : 10;
-    const page = req.query.hasOwnProperty('page') ? req.query.page : 1;
-    const sort = req.query.hasOwnProperty('sort') ? req.query.sort : null;
-    
-    const requestParam = new UserRequest();
-    requestParam.setId(user.users.id);
-    //Remote Procedure Call: Recommendation Server Python
-    const itemIds = await clientService.getItemRecommended(requestParam);
-    
-    return this.service.getItemBaseOnRS({limit, page, sort}, itemIds.getItemidsList());
-    } catch(err) {
-        console.log('-->err', err);
-        //ToDo: get job in normal mode
+      const limit = req.query.hasOwnProperty('limit') ? req.query.limit : 10;
+      const page = req.query.hasOwnProperty('page') ? req.query.page : 1;
+      const sort = req.query.hasOwnProperty('sort') ? req.query.sort : null;
+
+      const requestParam = new UserRequest();
+      requestParam.setId(user.users.id);
+      //Remote Procedure Call: Recommendation Server Python
+      const itemIds = await clientService.getItemRecommended(requestParam);
+
+      return this.service.getItemBaseOnRS({ limit, page, sort }, itemIds.getItemidsList());
+    } catch (err) {
+      console.log('-->err', err);
+      //ToDo: get job in normal mode
     }
   }
 
@@ -677,6 +667,7 @@ export class JobsController extends BaseController<Job> {
   async getAllCurrentTags() {
     return this.service.getAllCurrentTags();
   }
+
   @Post('/deny')
   async denyCandidate(@Query('cvId') cvId: string, @Query('jobId') jobId: string) {
     console.log(cvId);
@@ -714,6 +705,14 @@ export class JobsController extends BaseController<Job> {
     return {
       isDenied: true,
     }
+  }
+
+  @Get('/search/autocomplete')
+  async searchJobAutocomplete(@Query('s') s: string) {
+    const res = await getManager().query(
+      `SELECT TOP 5 name, id from tags WHERE name LIKE '%${s}%'`
+    )
+    return res;
   }
 }
 
