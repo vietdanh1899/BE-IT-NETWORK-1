@@ -270,6 +270,15 @@ export class JobsController extends BaseController<Job> {
       // return acceptedUser;
       console.log('da goi accept');
       await this.service.acceptJob(jobDTO.userId, id, user.users.id);
+
+      const sendTitle = 'Your CV has been reviewed and accepted by the recruitment';
+      const sendBody = `Congratulation, your CV has been accepted by the recruitment for ${job.name}. Contact them to get more details!`;
+      this.service.sendAppNotification(acceptedUser.id, {
+        notification: {
+          title: sendTitle,
+          body: sendBody
+        }
+      })
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -282,8 +291,8 @@ export class JobsController extends BaseController<Job> {
       const mailOptions = {
         from: '"Career Network" <vietdanh.kiemtien.01@gmail.com>', // sender address
         to: acceptedUser.email, // list of receivers
-        subject: 'Your CV has been reviewed and accepted by the recruitment', // Subject line
-        text: `Congratulation, your CV has been accepted by the recruitment for ${job.name}. Contact them to get more details!`, // plain text body
+        subject: sendTitle, // Subject line
+        text: sendBody, // plain text body
         // html: `<a>Here's your password for login as employee</b><p>Make sure you don't share this email public</p><b>password: ${generatePassword}</b><p>Our best</p><b>Twist Team</b>`, // html body
       };
 
@@ -677,8 +686,17 @@ export class JobsController extends BaseController<Job> {
     console.log(jtc);
     if (!jtc) return "not found";
     await getManager().query(
-      `UPDATE "job_to_cv" set "isDenied"= true, "status"=false WHERE "jobToCvId"='${jtc.jobToCvId}'`
+      `UPDATE "job_to_cv" set "isDenied" = 'true', "status"= 'false' WHERE "jobToCvId"='${jtc.jobToCvId}'`
     );
+
+    const sendTitle = 'Your CV has been reviewed and denied by the recruitment';
+    const sendBody = `Unfortunately, your CV has been denied by the recruitment for ${jtc.job.name}. Contact them to get more details!`;
+    this.service.sendAppNotification(jtc.cv.profile.user.id, {
+      notification: {
+        title: sendTitle,
+        body: sendBody
+      }
+    })
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -691,8 +709,8 @@ export class JobsController extends BaseController<Job> {
     const mailOptions = {
       from: '"Career Network" <vietdanh.kiemtien.01@gmail.com>', // sender address
       to: jtc.cv.profile.user.email, // list of receivers
-      subject: 'Your CV has been reviewed and denied by the recruitment', // Subject line
-      text: `Congratulation, your CV has been denied by the recruitment for ${jtc.job.name}. Contact them to get more details!`, // plain text body
+      subject: sendTitle, // Subject line
+      text: sendBody, // plain text body
     };
 
     transporter.sendMail(mailOptions, function (error, info) {

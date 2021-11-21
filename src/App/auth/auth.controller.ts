@@ -16,13 +16,17 @@ import {
   UploadAvatar,
 } from 'src/App/auth/auth.dto';
 import { ValidationPipe } from 'src/shared/validation.pipe';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserSession } from 'src/common/decorators/user.decorator';
 import { Methods } from 'src/common/decorators/method.decorator';
 import { methodEnum } from 'src/common/enums/method.enum';
 import { Modules } from 'src/common/decorators/module.decorator';
 import { ModuleEnum } from 'src/common/enums/module.enum';
 import { PossessionGuard } from 'src/guards/posessionHandle.guard';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { AppToken } from 'src/entity/app_token.entity';
+import { getManager, getRepository } from 'typeorm';
+import { User } from 'src/entity/user.entity';
 
 @ApiTags('v1/auth')
 @Controller('api/v1/auth')
@@ -88,4 +92,17 @@ export class AuthController {
     return await this.authService.getRecently(id);
   }
 
+  /* Register App Token */
+  @Post('appToken')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async registerAppToken(@UserSession() user, @Body('appToken') appToken: string) {
+    const userId: string = user.users.id;
+    const foundUser = await getRepository(User).findOne(userId);
+    const aToken = new AppToken();
+    aToken.token = appToken;
+    aToken.user = foundUser;
+    const res = await getManager().save(aToken);
+    return res;
+  }
 }

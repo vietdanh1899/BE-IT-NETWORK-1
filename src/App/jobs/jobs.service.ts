@@ -27,6 +27,8 @@ import { JobRecently } from 'src/entity/job_recently.entity';
 import { PaginationOption } from 'src/common/Paginate';
 import { clientService } from 'src/grpc/route.service';
 import { Check } from 'models/rs_pb';
+import { MessagingPayload } from 'firebase-admin/lib/messaging/messaging-api';
+import * as admin from 'firebase-admin';
 @Injectable()
 export class JobService extends TypeOrmCrudService<Job> {
   private tableName = 'job_favorite ';
@@ -426,5 +428,13 @@ export class JobService extends TypeOrmCrudService<Job> {
 
   async getAllCurrentTags() {
     return this.repository.getAllCurrentTagsAsync();
+  }
+
+  async sendAppNotification(userId: string, payload: MessagingPayload) {
+    const foundUser = await getRepository(User).findOne(userId, { relations: ['appTokens'] });
+    if (foundUser?.appTokens?.length) {
+      return admin.messaging().sendToDevice(foundUser.appTokens.map((at) => at.token), payload);
+    }
+    return 'No User or Token Valid';
   }
 }

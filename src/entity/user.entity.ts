@@ -36,6 +36,7 @@ import { AppliedJob } from './applied_job.entity';
 import RoleId from 'src/types/RoleId';
 import { JobRecently } from './job_recently.entity';
 import { JobFavorite } from './job_favorite.entity';
+import { AppToken } from './app_token.entity';
 const { CREATE, UPDATE } = CrudValidationGroups;
 
 @Entity('users')
@@ -168,13 +169,17 @@ export class User extends Base {
    */
   @OneToMany(type => JobRecently,
     j => j.user,
-    )
-    recently: JobRecently[]
+  )
+  recently: JobRecently[]
 
   @OneToMany(type => JobFavorite,
     j => j.user
-    )
-    favorite: JobFavorite[]
+  )
+  favorite: JobFavorite[]
+
+  @OneToMany(() => AppToken, appToken => appToken.user)
+  appTokens: AppToken[];
+
   /**
    * Exec Hash Function before Insert
    */
