@@ -20,7 +20,7 @@ export class Tag extends Base {
 
   @IsOptional({ groups: [UPDATE] })
   @IsNotEmpty({ groups: [CREATE] })
-  @Column({ type: 'nvarchar' })
+  @Column({ type: 'nvarchar', unique: true })
   @Index()
   name: string;
 
