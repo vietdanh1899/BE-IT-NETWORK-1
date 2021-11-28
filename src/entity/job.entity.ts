@@ -103,12 +103,11 @@ export class Job extends Base {
 
   @ApiProperty({ example: [3, 2, 19] })
   @IsOptional({ groups: [UPDATE] })
-  @IsNotEmpty({ groups: [CREATE] })
-  cateIds: Array<number | string>;
+  tagIds: Array<number | string>;
+
   /**
    * Relation between User and Job
    */
-
   @ManyToOne(
     type => User,
     user => user,

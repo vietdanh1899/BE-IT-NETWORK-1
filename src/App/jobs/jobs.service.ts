@@ -29,6 +29,7 @@ import { clientService } from 'src/grpc/route.service';
 import { Check } from 'models/rs_pb';
 import { MessagingPayload } from 'firebase-admin/lib/messaging/messaging-api';
 import * as admin from 'firebase-admin';
+import { Tag } from 'src/entity/tag.entity';
 @Injectable()
 export class JobService extends TypeOrmCrudService<Job> {
   private tableName = 'job_favorite ';
@@ -160,10 +161,10 @@ export class JobService extends TypeOrmCrudService<Job> {
       if (!createAddr) {
         return new BadRequestException('Address is invalid type');
       }
-      const findCateIds = await this.cateRepository.findByIds(dto.cateIds);
+      const findCateIds = await getRepository(Tag).findByIds(dto.tagIds);
       const createJob = this.repository.create({
         ...dto,
-        categories: findCateIds,
+        tags: findCateIds,
         address: createAddr,
       });
       return await this.repository.save(createJob);
