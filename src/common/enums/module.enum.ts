@@ -10,4 +10,5 @@ export enum ModuleEnum {
   EDUCATION = 'EDUCATION',
   EXPERIENCE = 'EXPERIENCE',
   ADDRESS = 'ADDRESS',
+  TAG = 'TAG'
 }

@@ -80,7 +80,6 @@ export class AuthController {
   async getProfile(@UserSession() user: any) {
     
     const { id } = user.users;
-    console.log(id)
     return await this.authService.getProfile(id);
   }
 

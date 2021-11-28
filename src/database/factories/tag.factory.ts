@@ -1,7 +1,7 @@
 import { define } from 'typeorm-seeding';	
 import * as Faker from 'faker';	
-import { Tag } from '../../entity/tag.entity';	
 import { getSlug } from '../../core/utils/helper';	
+import { Tag } from 'src/App/tags/entities/tag.entity';
 
 define(Tag, (faker: typeof Faker, context: { payload?: Tag }) => {	
   const { payload } = context;	

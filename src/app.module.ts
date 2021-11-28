@@ -19,6 +19,7 @@ import { AddressModule } from './App/address/address.module';
 import { ApplyController } from './App/apply/apply.controller';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { TagsModule } from './App/tags/tags.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { join } from 'path';
     PermissionModule,
     AuthModule,
     AddressModule,
+    TagsModule,
     JobsModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
