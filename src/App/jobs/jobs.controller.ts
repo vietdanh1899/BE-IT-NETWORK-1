@@ -15,7 +15,7 @@ import {
   SetMetadata,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
   Crud,
   CrudRequest,
@@ -45,18 +45,17 @@ import { getDistance } from 'geolib';
 import { JobToCv } from 'src/entity/jobtocv.entity';
 import { clientService } from 'src/grpc/route.service';
 import { UserRequest } from 'models/rs_pb';
-import { Tag } from 'src/entity/tag.entity';
 
 @Crud({
   model: {
     type: Job,
   },
   params: {
-    id: {
-      field: 'id',
-      type: 'string',
-      primary: true,
-    },
+      id: {
+        field: 'id',
+        type: 'string',
+        primary: true,
+      },
   },
   query: {
     filter: [],
@@ -673,29 +672,9 @@ export class JobsController extends BaseController<Job> {
     }
   }
 
-  /* Get all tags */
   @Get('/tags/all')
   async getAllCurrentTags() {
     return this.service.getAllCurrentTags();
-  }
-
-  /* Create one tag */
-  @ApiBody({
-    required: true,
-    schema: {
-      type: 'object',
-      properties: {
-        tagName: {
-          type: 'string',
-        },
-      },
-    },
-  })
-  @Post('/tags')
-  async createOneTag(@Body('tagName') tagName: string) {
-    const newTag = new Tag();
-    newTag.name = tagName;
-    return await getRepository(Tag).save(newTag);
   }
 
   @Post('/deny')

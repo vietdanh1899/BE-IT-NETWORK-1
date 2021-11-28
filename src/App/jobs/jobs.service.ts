@@ -29,7 +29,7 @@ import { clientService } from 'src/grpc/route.service';
 import { Check } from 'models/rs_pb';
 import { MessagingPayload } from 'firebase-admin/lib/messaging/messaging-api';
 import * as admin from 'firebase-admin';
-import { Tag } from 'src/entity/tag.entity';
+import { Tag } from '../tags/entities/tag.entity';
 @Injectable()
 export class JobService extends TypeOrmCrudService<Job> {
   private tableName = 'job_favorite ';
