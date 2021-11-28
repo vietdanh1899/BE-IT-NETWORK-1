@@ -1,8 +1,8 @@
 import { BaseRepository } from 'src/common/Base/base.repository';
 import { EntityRepository, Repository } from 'typeorm';
 import { getManager, Connection } from 'typeorm';
-import { Tag } from 'src/entity/tag.entity';
 import { Job } from 'src/entity/job.entity';
+import { Tag } from '../tags/entities/tag.entity';
 
 @EntityRepository(Job)
 export class JobRepository extends BaseRepository<Job> {

@@ -27,9 +27,9 @@ import { Address } from './address.entity';
 import { Exclude } from 'class-transformer';
 import { AppliedJob } from './applied_job.entity';
 import { JobToCv } from './jobtocv.entity';
-import { Tag } from './tag.entity';
 import { JobRecently } from './job_recently.entity';
 import { JobFavorite } from './job_favorite.entity';
+import { Tag } from 'src/App/tags/entities/tag.entity';
 
 const { CREATE, UPDATE } = CrudValidationGroups;
 @Entity('jobs')

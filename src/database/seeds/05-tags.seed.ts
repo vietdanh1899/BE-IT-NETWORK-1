@@ -1,9 +1,9 @@
-import { Tag } from '../../entity/tag.entity';
 import { User } from '../../entity/user.entity';
 import { Connection } from 'typeorm';
 import { Factory, Seeder } from 'typeorm-seeding';
 import * as _ from 'lodash';
 import * as jobs from '../data/jobs.json';
+import { Tag } from 'src/App/tags/entities/tag.entity';
 
 export default class TagSeeder implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<any> {
