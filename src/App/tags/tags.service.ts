@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateManyDto, CrudRequest } from '@nestjsx/crud';
+import { CreateManyDto, CrudRequest, GetManyDefaultResponse } from '@nestjsx/crud';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { DeepPartial, DeleteResult, UpdateResult } from 'typeorm';
 import { CreateTagDto } from './dto/create-tag.dto';
@@ -18,6 +18,13 @@ export class TagsService extends TypeOrmCrudService<Tag> {
     super(repo);
   }
 
+  async getOneBase(req: CrudRequest) : Promise<TagDto> {
+    return await this.getOne(req);
+  }
+
+  async getManyBase(req: CrudRequest) : Promise<GetManyDefaultResponse<TagDto> | TagDto[]> {
+    return await this.getMany(req);
+  }
   async createOneBase(req: CrudRequest, dto: CreateTagDto): Promise<TagDto> {
     return await this.createOne(req, dto);
   }
