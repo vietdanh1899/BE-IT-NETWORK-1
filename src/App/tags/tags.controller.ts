@@ -26,6 +26,8 @@ import { TagsService } from './tags.service';
   },
   serialize: {
     create: TagDto,
+    get: TagDto,
+    getMany: TagDto
   },
   dto: {
     create: CreateTagDto,
@@ -51,8 +53,17 @@ export class TagsController {
   getManyBase?(req: CrudRequest): Promise<GetManyDefaultResponse<Tag> | Tag[]> {
     throw new Error('Method not implemented.');
   }
-  getOneBase?(req: CrudRequest): Promise<Tag> {
-    throw new Error('Method not implemented.');
+  
+  @Methods(methodEnum.READ)
+  @Override('getOneBase')
+  async getOne(@ParsedRequest() req: CrudRequest) : Promise<TagDto> {
+    return await this.tagsService.getOneBase(req);
+  }
+
+  @Methods(methodEnum.READ)
+  @Override('getManyBase')
+  async getMany(@ParsedRequest() req: CrudRequest) : Promise<GetManyDefaultResponse<TagDto> | TagDto[]> {
+      return await this.tagsService.getManyBase(req);
   }
 
   @Methods(methodEnum.CREATE)
