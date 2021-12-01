@@ -47,18 +47,27 @@ class RecommendationServicer(rs_pb2_grpc.RecommendationServicer):
     def GetItemRecommended(self, request, context):
         indexUserId = self.get_Index_user(request.id)
         itemIdsRated = self.yhat[:, indexUserId]
-        print('itemIdsRated', itemIdsRated)
-        output = np.asarray([idx for idx, element in enumerate(itemIdsRated) if (element > 3.5)])
+        output = np.asarray([idx for idx, element in enumerate(itemIdsRated) if (element > 0)])
+        print('output 1', output)
+
         if output.size == 0:
+            # Get Most popular
             itemIds = self.GetMostPularItem()
             return rs_pb2.ItemResponse(itemIds=itemIds)
         else:
+            # get rated item
             itemIds = self.data[output, 0]
-            return rs_pb2.ItemResponse(itemIds=itemIds)
+            print('itemIdsRated', itemIdsRated)
+            print('output', output)
+            #return index of a sorted list
+            indexItemSortedIds = sorted(range(len(itemIds)), key=lambda k: itemIds[k], reverse=True)
+            print('item sorted', indexItemSortedIds)
+            return rs_pb2.ItemResponse(itemIds=self.data[:,0][indexItemSortedIds]) #return sorted List ids of item by uuid
 
     def GetMostPularItem(self):
         sumArr = np.asarray(list(map((lambda  x: sum(x)), self.yhat)))
-        indexItemSortedIds = sorted(range(len(sumArr)), key=lambda k : sumArr[k])
+        # return index of a sorted list
+        indexItemSortedIds = sorted(range(len(sumArr)), key=lambda k : sumArr[k], reverse=True)
         return self.data[:,0][indexItemSortedIds] #return sorted List ids of item by uuid
 
     def get_Index_user(self, userId):
