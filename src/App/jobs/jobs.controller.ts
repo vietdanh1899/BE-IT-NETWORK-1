@@ -665,7 +665,7 @@ export class JobsController extends BaseController<Job> {
       //Remote Procedure Call: Recommendation Server Python
       const itemIds = await clientService.getItemRecommended(requestParam);
 
-      return this.service.getItemBaseOnRS({ limit, page, sort }, itemIds.getItemidsList());
+      return this.service.getItemBaseOnRS({ limit, page, sort }, itemIds.getItemidsList(), user.users.id);
     } catch (err) {
       console.log('-->err', err);
       //ToDo: get job in normal mode

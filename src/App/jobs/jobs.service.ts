@@ -24,7 +24,7 @@ import { isUUID } from 'class-validator';
 import RoleId from 'src/types/RoleId';
 import { JobFavorite } from 'src/entity/job_favorite.entity';
 import { JobRecently } from 'src/entity/job_recently.entity';
-import { PaginationOption } from 'src/common/Paginate';
+import { Pagination, PaginationOption } from 'src/common/Paginate';
 import { clientService } from 'src/grpc/route.service';
 import { Check } from 'models/rs_pb';
 import { MessagingPayload } from 'firebase-admin/lib/messaging/messaging-api';
@@ -392,16 +392,31 @@ export class JobService extends TypeOrmCrudService<Job> {
     }
   }
 
-  async getItemBaseOnRS(req: PaginationOption, ids: Array<string>) {
-    const results: any = await this.repository.paginate(
+  async getItemBaseOnRS(req: PaginationOption, ids: Array<string>, userId: string) {
+    const { limit, page } = req;
+    // const results: any = await this.repository.paginate(
+    //   {
+    //     limit: req.limit,
+    //     page: req.page,
+    //   },
+    //   { relations: ['user', 'user.profile', 'user.address'] },
+    //   { condition: { id: In(ids) } },
+    // );
+    // return results;
+    const viewedIds = await (await getRepository(JobRecently).find({
+      select: ['jobId'],
+      where: { userId: userId }
+    })).map((jobrecently) => jobrecently.jobId);
+    const idsExceptViewed = ids.filter((id) => viewedIds.indexOf(id) === -1)
+    const selectIds = idsExceptViewed.slice((page - 1) * limit, page * limit);
+    const jobs = await this.repository.find(
       {
-        limit: req.limit,
-        page: req.page,
-      },
-      { relations: ['user', 'user.profile', 'user.address'] },
-      { condition: { id: In(ids) } },
-    );
-    return results;
+        where: { id: In(selectIds) },
+        relations: ['user', 'user.profile', 'user.address'],
+      }
+    )
+    const sortedJobs = selectIds.map((id) => jobs.find(job => job.id === id));
+    return new Pagination<Job>({ results: sortedJobs, total: sortedJobs.length, limit: limit });
   }
 
   async getAcceptedUserByJobId(id: string) {
