@@ -44,12 +44,12 @@ export class Job extends Base {
   @Column()
   name: string;
 
-  @ApiProperty({ example: 'string' })
-  @IsOptional({ groups: [UPDATE] })
-  @IsNotEmpty({ groups: [CREATE] })
-  @IsString({ always: true })
-  @Column({type: 'nvarchar', length: 'MAX', nullable: true })
-  content: string;
+  // @ApiProperty({ example: 'string' })
+  // @IsOptional({ groups: [UPDATE] })
+  // @IsNotEmpty({ groups: [CREATE] })
+  // @IsString({ always: true })
+  // @Column({ type: 'nvarchar', length: 'MAX', nullable: true })
+  // content: string;
 
   @ApiProperty({ example: 1000 })
   @IsOptional({ groups: [UPDATE, CREATE] })
@@ -101,10 +101,6 @@ export class Job extends Base {
   @Column({ default: false })
   status: boolean;
 
-  @ApiProperty({ example: [3, 2, 19] })
-  @IsOptional({ groups: [UPDATE] })
-  tagIds: Array<number | string>;
-
   /**
    * Relation between User and Job
    */
@@ -137,21 +133,6 @@ export class Job extends Base {
   /**
    * The relationship between Job and address
    */
-
-  @ApiProperty({ example: 48 })
-  @IsInt({ always: true })
-  city: number;
-
-  @ApiProperty({ example: '54 Nguyen Thi Minh Khai' })
-  @IsString()
-  street: string;
-
-  @ApiProperty({ example: 15.99119 })
-  longitude: number;
-
-  @ApiProperty({ example: 108.137062 })
-  latitude: number;
-
   @ManyToOne(
     type => Address,
     address => address.jobs,
@@ -172,13 +153,13 @@ export class Job extends Base {
    */
   @OneToMany(type => JobRecently,
     j => j.job
-    )
-    recently: JobRecently[];
-   
-    @OneToMany(type => JobFavorite,
-      j => j.job
-    )
-    favoriteBy: JobFavorite[];
+  )
+  recently: JobRecently[];
+
+  @OneToMany(type => JobFavorite,
+    j => j.job
+  )
+  favoriteBy: JobFavorite[];
 
   @OneToMany(() => JobToCv, jobToCv => jobToCv.job)
   public jobToCvs!: JobToCv[];
@@ -190,7 +171,7 @@ export class Job extends Base {
   @ManyToMany(
     type => Tag,
     tag => tag.jobs,
-    {cascade: true}
+    { cascade: true }
   )
   @JoinTable({
     joinColumn: {

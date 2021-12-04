@@ -45,17 +45,18 @@ import { getDistance } from 'geolib';
 import { JobToCv } from 'src/entity/jobtocv.entity';
 import { clientService } from 'src/grpc/route.service';
 import { UserRequest } from 'models/rs_pb';
+import { CreateJobDTO } from './createJob.dto';
 
 @Crud({
   model: {
     type: Job,
   },
   params: {
-      id: {
-        field: 'id',
-        type: 'string',
-        primary: true,
-      },
+    id: {
+      field: 'id',
+      type: 'string',
+      primary: true,
+    },
   },
   query: {
     filter: [],
@@ -115,11 +116,8 @@ export class JobsController extends BaseController<Job> {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Methods(methodEnum.CREATE)
-  @UsePipes(new ValidationPipe())
-  async createOne(@ParsedRequest() req: CrudRequest, @ParsedBody() dto: Job, @UserSession() user) {
-    const currentUser = await this.userRepository.findOne({ id: user.users.id });
-    dto.user = currentUser;
-    return this.service.createJob(dto);
+  async createOne(@Body() dto: CreateJobDTO, @UserSession() user) {
+    return this.service.createJob(dto, user.users.id);
   }
 
   @Override('getManyBase')

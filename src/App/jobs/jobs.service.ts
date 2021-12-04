@@ -11,7 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { Job } from 'src/entity/job.entity';
 import { JobRepository } from './jobs.repository';
-import { getManager, getRepository, In, IsNull, Not } from 'typeorm';
+import { getManager, getRepository, In } from 'typeorm';
 import { UserRepository } from '../users/user.repository';
 import { CategoryRepository } from '../categories/categories.repository';
 import axios from 'axios';
@@ -30,6 +30,7 @@ import { Check } from 'models/rs_pb';
 import { MessagingPayload } from 'firebase-admin/lib/messaging/messaging-api';
 import * as admin from 'firebase-admin';
 import { Tag } from '../tags/entities/tag.entity';
+import { CreateJobDTO } from './createJob.dto';
 @Injectable()
 export class JobService extends TypeOrmCrudService<Job> {
   private tableName = 'job_favorite ';
@@ -137,7 +138,7 @@ export class JobService extends TypeOrmCrudService<Job> {
     }
   }
 
-  async createJob(dto: Job) {
+  async createJob(dto: CreateJobDTO, userId: string) {
     try {
       const { latitude, longitude } = dto;
       const provinces = await await axios.get(
@@ -152,7 +153,7 @@ export class JobService extends TypeOrmCrudService<Job> {
             latitude,
             longitude,
             city: dto.city,
-            description: dto.street,
+            description: dto.fullAddress,
           });
           createAddr = await this.addressRepository.save(createAddr);
           break;
@@ -162,11 +163,14 @@ export class JobService extends TypeOrmCrudService<Job> {
         return new BadRequestException('Address is invalid type');
       }
       const findCateIds = await getRepository(Tag).findByIds(dto.tagIds);
+      const currentUser = await this.userRepository.findOne({ id: userId });
       const createJob = this.repository.create({
         ...dto,
+        user: currentUser,
         tags: findCateIds,
         address: createAddr,
       });
+
       return await this.repository.save(createJob);
     } catch (error) {
       throw new InternalServerErrorException(
