@@ -32,11 +32,11 @@ export class Address extends Base {
   description: string;
 
   @IsOptional({ groups: [UPDATE, CREATE] })
-  @Column({ type: 'decimal', nullable: true })
+  @Column({ type: 'float', nullable: true })
   latitude: number;
 
   @IsOptional({ groups: [UPDATE, CREATE] })
-  @Column({ type: 'decimal', nullable: true })
+  @Column({ type: 'float', nullable: true })
   longitude: number;
 
   /**

@@ -54,7 +54,8 @@ export class HttpErorFilter implements ExceptionFilter {
           timestamp: new Date().toISOString(),
           path: request.url,
           method: request.method,
-          message: messageErr,
+          // message: messageErr,
+          message: exceptionError.message,
         });
         break;
 

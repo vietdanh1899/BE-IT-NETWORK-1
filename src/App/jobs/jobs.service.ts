@@ -419,7 +419,12 @@ export class JobService extends TypeOrmCrudService<Job> {
         relations: ['user', 'user.profile', 'user.address'],
       }
     )
-    const sortedJobs = selectIds.map((id) => jobs.find(job => job.id === id));
+    const sortedJobs = selectIds.reduce((result, id) => {
+      const job = jobs.find(job => job.id === id);
+      if (job) result.push(job)
+      return result
+    }, [])
+    // const sortedJobs = selectIds.map((id) => jobs.find(job => job.id === id));
     return new Pagination<Job>({ results: sortedJobs, total: sortedJobs.length, limit: limit });
   }
 

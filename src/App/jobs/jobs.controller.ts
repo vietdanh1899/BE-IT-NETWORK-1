@@ -14,8 +14,9 @@ import {
   Request,
   SetMetadata,
   Query,
+  Patch,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import {
   Crud,
   CrudRequest,
@@ -46,6 +47,7 @@ import { JobToCv } from 'src/entity/jobtocv.entity';
 import { clientService } from 'src/grpc/route.service';
 import { UserRequest } from 'models/rs_pb';
 import { CreateJobDTO } from './createJob.dto';
+import { Tag } from '../tags/entities/tag.entity';
 
 @Crud({
   model: {
@@ -558,16 +560,16 @@ export class JobsController extends BaseController<Job> {
     }
   }
 
-  @Override('updateOneBase')
-  async restore(@ParsedRequest() req: CrudRequest): Promise<void> {
-    const id = req.parsed.paramsFilter.find(
-      f => f.field === 'id' && f.operator === '$eq',
-    ).value;
+  /* Restore one Job */
+  @Patch('/restore/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async restore(@Param('id') id: string): Promise<void> {
+    // const id = req.parsed.paramsFilter.find(
+    //   f => f.field === 'id' && f.operator === '$eq',
+    // ).value;
 
-    const data = await this.repository.findOne({
-      withDeleted: true,
-      where: { id, deletedat: Not(IsNull()) },
-    });
+    const data = await this.repository.findOne(id, { withDeleted: true });
     if (!data) {
       throw new HttpException(
         {
@@ -670,11 +672,33 @@ export class JobsController extends BaseController<Job> {
     }
   }
 
+  /* Get all tags */
   @Get('/tags/all')
   async getAllCurrentTags() {
     return this.service.getAllCurrentTags();
   }
 
+  /* Create one tag */
+  @ApiBody({
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        tagName: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  @Post('/tags')
+  async createOneTag(@Body('tagName') tagName: string) {
+    const newTag = new Tag();
+    newTag.name = tagName;
+    return await getRepository(Tag).save(newTag);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Post('/deny')
   async denyCandidate(@Query('cvId') cvId: string, @Query('jobId') jobId: string) {
     console.log(cvId);
