@@ -69,6 +69,7 @@ export class UploadController {
   )
   saveFile(@UploadedFile() file, @Res() res) {
     const client = new google.auth.OAuth2(this.clientId, this.clientSecret, this.redirectUri);
+    const unlinkAsync = promisify(fs.unlink);
 
     client.setCredentials({ refresh_token: this.refreshToken });
 
@@ -87,7 +88,8 @@ export class UploadController {
         mimeType: file.mimetype,
         body: fs.createReadStream(file.path),
       },
-    }, (err, response) => {
+    }, async (err, response) => {
+      await unlinkAsync(file.path);
       res.json({
         data: {
           url: `https://drive.google.com/uc?id=${response.data.id}`,
@@ -106,101 +108,5 @@ export class UploadController {
       version: 'v3',
       auth: client,
     });
-  }
-
-
-
-  // createDriveClient(clientId: string, clientSecret: string, redirectUri: string, refreshToken: string) {
-  //   const client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
-
-  //   client.setCredentials({ refresh_token: refreshToken });
-
-  //   return google.drive({
-  //     version: 'v3',
-  //     auth: client,
-  //   });
-  // }
-
-  // async uploadFile(@UploadedFile() file, @Res() res) {
-  //   console.log('-->interceptor');
-    
-  //   this.path = file.path;
-  //   await fs.readFile('credentials.json', async (err, content: any) => {
-  //     if (err) {
-  //       throw new InternalServerErrorException('Error client secret file');
-  //     }
-
-  //     await this.authorize(JSON.parse(content), async auth => {
-  //       await this.uploadImage(auth, file.path, res);
-  //     });
-  //   });
-  // }
-
-  // authorize(credentials: any, callback: any) {
-  //   const TOKEN_PATH = 'token.json';
-  //   // eslint-disable-next-line @typescript-eslint/camelcase
-  //   const { client_secret, client_id, redirect_uris } = credentials.web;
-  //   const oAuth2Client = new google.auth.OAuth2(
-  //     client_id,
-  //     client_secret,
-  //     // eslint-disable-next-line @typescript-eslint/camelcase
-  //     redirect_uris[0],
-  //   );
-  //   console.log('-->read token');
-    
-  //   // Check if we have previously stored a token.
-  //   fs.readFile(TOKEN_PATH, (err, token: any) => {
-  //     if (err) {
-  //       throw new HttpException(
-  //         {
-  //           message: 'Internal Server Error',
-  //           status: HttpStatus.BAD_REQUEST,
-  //         },
-  //         HttpStatus.BAD_REQUEST,
-  //       );
-  //     }
-  //     // oAuth2Client.setCredentials(JSON.parse(token));
-  //     callback(oAuth2Client); //list files and upload file
-  //   });
-  // }
-
-  async uploadImage(auth, path, @Res() response) {
-    const drive = google.drive({ version: 'v3', auth });
-    const metaData = {
-      //   mimeType: 'image/jpeg',
-      body: fs.createReadStream(path),
-    };
-    const unlinkAsync = promisify(fs.unlink);
-    const fileMetadata = {
-      name: 'image.jpg',
-      parents: ['1Oz126Pce5-0P-qDjNr_ag8o73PBIxxu-'],
-    };
-    console.log('path', path);
-    await drive.files.create(
-      {
-        resource: fileMetadata,
-        media: metaData,
-        fields: 'id',
-      },
-      async function(err, res) {
-        if (err) {
-          // Handle error
-          throw new HttpException(
-            {
-              message: 'Internal Server Error',
-              status: HttpStatus.BAD_REQUEST,
-            },
-            HttpStatus.BAD_REQUEST,
-          );
-        } else {
-          await unlinkAsync(path);
-          response.json({
-            data: {
-              url: `https://drive.google.com/uc?id=${res.data.id}`,
-            },
-          });
-        }
-      },
-    );
   }
 }
