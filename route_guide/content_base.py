@@ -15,6 +15,8 @@ class ContentBase:
 
   @staticmethod
   def get_items_rated_by_user(rate_matrix, user_id):
+    print('user id', user_id);
+    print('rate_matrix', rate_matrix);
     y = rate_matrix[:, 0]
     ids = np.where(y == user_id)
     item_ids = rate_matrix[ids, 1];

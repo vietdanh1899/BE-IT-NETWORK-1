@@ -24,19 +24,31 @@ from content_base import ContentBase
 import rs_pb2
 import rs_pb2_grpc
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class RecommendationServicer(rs_pb2_grpc.RecommendationServicer):
     """Provides methods that implement functionality of route guide server."""
     def __init__(self):
-        yhat, users, data = InitDb()
-        self.yhat = yhat
-        self.users = users
-        self.data = data
+        self.server = os.getenv('SERVER')
+        self.user = os.getenv('USER')
+        self.password = os.getenv('PASSWORD')
+        self.port = os.getenv('PORT')
+        self.database = os.getenv('DATABASE_NAME')
+
+        print('server', self.server)
+        print('server', self.user)
+        print('server', self.password)
+        print('server', self.port)
+        print('server', self.database)
+
 
     def TrackChange(self, request, context):
         print('track change');
         try:
-          yhat, users, data = InitDb()
+          yhat, users, data = InitDb(self)
           self.yhat = yhat
           self.users = users
           self.data = data
@@ -78,8 +90,8 @@ def mapData(item, l_tags):
       i_map.insert(0, item[0])
       return np.asarray(i_map)
 
-def InitDb():
-    engine = create_engine("mssql+pyodbc://danh:123456789@itnetwork.viewdns.net:1433/itnetwork?driver=ODBC+Driver+17+for+SQL+Server")
+def InitDb(self):
+    engine = create_engine(f"mssql+pyodbc://{self.user}:{self.password}@{self.server}:{self.port}/{self.database}?driver=ODBC+Driver+17+for+SQL+Server")
     with engine.connect() as connection:
         result = connection.execute(text("SELECT jobs.id, tags.name  FROM dbo.jobs inner join job_tag on jobs.id = job_tag.jobId inner join tags on tags.id = job_tag.tagId"))
         test = [{column: value for column, value in rowproxy.items()} for rowproxy in result] #Return List of Dict
@@ -119,13 +131,17 @@ def getUserRatingMatrix(engine):
 
 async def serve() -> None:
   server = grpc.aio.server()
+
   rs_pb2_grpc.add_RecommendationServicer_to_server(
     RecommendationServicer(), server)
-  server.add_insecure_port('[::]:50051')
+
+  listen_addr = '[::]:50051'
+  server.add_insecure_port(listen_addr)
+  logging.info("Starting server on %s", listen_addr)
   await server.start()
   await server.wait_for_termination()
 
 
 if __name__ == '__main__':
-  logging.basicConfig(level=logging.INFO)
-  asyncio.get_event_loop().run_until_complete(serve())
+    logging.basicConfig(level=logging.INFO)
+    asyncio.run(serve())
