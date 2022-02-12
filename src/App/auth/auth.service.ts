@@ -135,6 +135,8 @@ export class AuthServices {
   }
 
   async addLead(dto: EmployersDTO) {
+    console.log('--->dto', dto);
+    
     try {
       const manager = getManager();
       const cityArr = [];
@@ -152,7 +154,9 @@ export class AuthServices {
         }
         cityArr.push({ city: dto.city[key] });
       });
-
+      
+      console.log('--->city arr', cityArr);
+      
       const createAddress = await this.addressRepository.create(cityArr);
       await this.addressRepository.save(createAddress);
 
@@ -168,7 +172,7 @@ export class AuthServices {
         roleId: RoleId.CONTRIBUTOR,
         email: dto.email,
         active: false,
-        password: 'default',
+        password: dto.password,
         profile: {
           phone: dto.phone,
           pageURL: dto.website,
@@ -177,15 +181,20 @@ export class AuthServices {
         },
         address: findAddress,
       });
-      console.log('Toi save');
+
       await this.userRepository.save(data);
       const { email, id, role, roleId, profile, createdat, updatedat } = data;
       return { email, id, role, roleId, profile, createdat, updatedat };
     } catch (error) {
+      console.log('-->err', error);
+      
       if (error.status == 400) {
         throw error;
       }
-      if (error.code == '23505') {
+      console.log('-->code', error.code);
+      console.log('-->number', error.number);
+      
+      if (error.number == 2627) {
         throw new HttpException(
           {
             message: 'Email Already exists',

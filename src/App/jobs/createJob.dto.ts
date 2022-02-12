@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsEnum, IsInt, IsISO8601, IsLatitude, IsLongitude, IsString, IsUrl } from "class-validator";
+import { IsArray, IsEnum, IsInt, IsISO8601, IsLatitude, IsLongitude, IsOptional, IsString, IsUrl } from "class-validator";
 import { JobType } from "src/common/enums/jobTypes.enum";
 
 export class CreateJobDTO {
@@ -35,6 +35,7 @@ export class CreateJobDTO {
       'https://eatsleepworkrepeat.com/wp-content/uploads/2020/06/office.jpg',
   })
   @IsUrl()
+  @IsOptional({always: true})
   introImg: string;
 
   @ApiProperty({ example: ["455FB471-7C3F-EC11-9EBA-D4258B0760D4", "465FB471-7C3F-EC11-9EBA-D4258B0760D4", "475FB471-7C3F-EC11-9EBA-D4258B0760D4"] })

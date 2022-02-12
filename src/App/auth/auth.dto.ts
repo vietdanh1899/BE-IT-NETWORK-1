@@ -69,6 +69,10 @@ export class EmployersDTO {
   @IsString({ always: true })
   website: string;
 
+  @IsNotEmpty()
+  @IsString({ always: true })
+  password: string;
+
   @ApiProperty({ example: [32, 31] })
   city: Array<number>;
 

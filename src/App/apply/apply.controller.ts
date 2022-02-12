@@ -21,38 +21,38 @@ export class ApplyController {
     
 
     /* Upload file */ 
-    @Post('/upload')
-    @UseInterceptors(FileInterceptor('file',
-        {
-            storage: diskStorage({
-                destination: './uploads/fileupload',
-                filename: (req, file, cb) => {
-                    const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
-                    return cb(null, `${randomName}${extname(file.originalname)}`)
-                }
-            })
-        }
-    )
-    )
-    @ApiConsumes('multipart/form-data')
-    @ApiBody({
-        required: true,
-        schema: {
-            type: 'object',
-            properties: {
-                file: {
-                    type: 'string',
-                    format: 'binary',
-                },
-            },
-        },
-    })
-    upload(@UploadedFile() file) {
-        console.log(file);
-        return {
-            url: `https://vietdanh.bike/fileupload/${file.filename}`,
-        };
-    }
+    // @Post('/upload')
+    // @UseInterceptors(FileInterceptor('file',
+    //     {
+    //         storage: diskStorage({
+    //             destination: './uploads/fileupload',
+    //             filename: (req, file, cb) => {
+    //                 const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+    //                 return cb(null, `${randomName}${extname(file.originalname)}`)
+    //             }
+    //         })
+    //     }
+    // )
+    // )
+    // @ApiConsumes('multipart/form-data')
+    // @ApiBody({
+    //     required: true,
+    //     schema: {
+    //         type: 'object',
+    //         properties: {
+    //             file: {
+    //                 type: 'string',
+    //                 format: 'binary',
+    //             },
+    //         },
+    //     },
+    // })
+    // upload(@UploadedFile() file) {
+    //     console.log(file);
+    //     return {
+    //         url: `https://vietdanh.bike/fileupload/${file.filename}`,
+    //     };
+    // }
 
     /* Fetch CV for user */
     @ApiBearerAuth()

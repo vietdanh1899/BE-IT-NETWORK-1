@@ -17,18 +17,17 @@ import { PermissionModule } from './App/permission/permission.module';
 import { JobsModule } from './App/jobs/jobs.module';
 import { AddressModule } from './App/address/address.module';
 import { ApplyController } from './App/apply/apply.controller';
+import { UploadModule } from './App/upload/upload/upload.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { TagsModule } from './App/tags/tags.module';
 
 @Module({
   imports: [
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../..', 'uploads'),
-    }),
+    ServeStaticModule.forRoot(),
     ConfigModule.forRoot(),
     UsersModule,
     CategoriesModule,
+    UploadModule,
     PermissionModule,
     AuthModule,
     AddressModule,

@@ -63,6 +63,10 @@ import { Tag } from '../tags/entities/tag.entity';
   query: {
     filter: [],
     join: {
+      appliedBy: {
+        eager: true,
+        exclude: ['createdat', 'updatedat', 'deletedat'],
+      },
       user: {
         eager: true,
         exclude: [
@@ -165,6 +169,9 @@ export class JobsController extends BaseController<Job> {
 
   @Get('all')
   async getAll(@Body('userId') userId: string) {
+    debugger;
+    console.log('--->user', userId);
+    
     const allJob: any = await this.repository.find();
     const currentDate = new Date();
     const checkJobDeadline = allJob.filter(job => {
@@ -431,6 +438,8 @@ export class JobsController extends BaseController<Job> {
         isDenied
       };
     } catch (error) {
+      console.log('--->err', error);
+      
       throw new HttpException(
         {
           message: 'Job not found',
@@ -667,7 +676,7 @@ export class JobsController extends BaseController<Job> {
 
       return this.service.getItemBaseOnRS({ limit, page, sort }, itemIds.getItemidsList(), user.users.id);
     } catch (err) {
-      console.log('-->err', err);
+      throw err;
       //ToDo: get job in normal mode
     }
   }
