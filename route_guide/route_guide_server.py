@@ -37,7 +37,7 @@ class RecommendationServicer(rs_pb2_grpc.RecommendationServicer):
         self.password = os.getenv('PASSWORD')
         self.port = os.getenv('PORT')
         self.database = os.getenv('DATABASE_NAME')
-
+        InitDb(self)
         print('server', self.server)
         print('server', self.user)
         print('server', self.password)
