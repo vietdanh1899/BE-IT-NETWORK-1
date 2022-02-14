@@ -91,11 +91,11 @@ def mapData(item, l_tags):
       return np.asarray(i_map)
 
 def InitDb(self):
-    params = urllib.parse.quote_plus("DRIVER={ODBC+Driver+17+for+SQL+Server};"
-                                     "SERVER=128.199.138.58;"
-                                     "DATABASE=CV_APP;"
-                                     "UID=sa;"
-                                     "PWD=1234!@#$QWER")
+    params = urllib.parse.quote_plus("DRIVER=ODBC+Driver+17+for+SQL+Server;"
+                                     "SERVER="+self.server+";"
+                                     "DATABASE="+self.database+";"
+                                     "UID="+self.user+";"
+                                     "PWD="+self.password)
     engine = create_engine("mssql+pyodbc:///?odbc_connect={}".format(params))
 
     with engine.connect() as connection:
