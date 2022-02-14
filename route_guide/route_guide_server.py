@@ -23,10 +23,9 @@ import grpc
 from content_base import ContentBase
 import rs_pb2
 import rs_pb2_grpc
-
+import urllib
 import os
 from dotenv import load_dotenv
-
 load_dotenv()
 
 class RecommendationServicer(rs_pb2_grpc.RecommendationServicer):
@@ -37,12 +36,13 @@ class RecommendationServicer(rs_pb2_grpc.RecommendationServicer):
         self.password = os.getenv('PASSWORD')
         self.port = os.getenv('PORT')
         self.database = os.getenv('DATABASE_NAME')
-        InitDb(self)
         print('server', self.server)
         print('server', self.user)
         print('server', self.password)
         print('server', self.port)
         print('server', self.database)
+
+        InitDb(self)
 
 
     def TrackChange(self, request, context):
@@ -91,7 +91,13 @@ def mapData(item, l_tags):
       return np.asarray(i_map)
 
 def InitDb(self):
-    engine = create_engine(f"mssql+pyodbc://{self.user}:{self.password}@{self.server}:{self.port}/{self.database}?driver=ODBC+Driver+17+for+SQL+Server")
+    params = urllib.parse.quote_plus("DRIVER={ODBC+Driver+17+for+SQL+Server};"
+                                     "SERVER=128.199.138.58;"
+                                     "DATABASE=CV_APP;"
+                                     "UID=sa;"
+                                     "PWD=1234!@#$QWER")
+    engine = create_engine("mssql+pyodbc:///?odbc_connect={}".format(params))
+
     with engine.connect() as connection:
         result = connection.execute(text("SELECT jobs.id, tags.name  FROM dbo.jobs inner join job_tag on jobs.id = job_tag.jobId inner join tags on tags.id = job_tag.tagId"))
         test = [{column: value for column, value in rowproxy.items()} for rowproxy in result] #Return List of Dict
