@@ -18,13 +18,11 @@ const { google } = require('googleapis');
 
 @Controller('api/v1/upload')
 export class UploadController {
-  private path: string;
-  private url: string;
   private driveClient;
-  private readonly clientId: string = "412128120694-amgbn8h4gm4kej0383mf8vud30harb13.apps.googleusercontent.com";
-  private readonly clientSecret:string = "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";
-  private readonly redirectUri: string = "https://developers.google.com/oauthplayground";
-  private readonly refreshToken:string = "1//04i_RjCFUwAw7CgYIARAAGAQSNwF-L9IrCpxdUV7lQSuVQXHwNCE-bALuuw_TV5uMsGgXOI_PXNcV_z957RYUUumV1v9-Rl9gx1M";
+  private readonly clientId: string = process.env.CLIENT_ID;
+  private readonly clientSecret:string = process.env.CLIENT_SECRET;
+  private readonly redirectUri: string = process.env.REDIRECT_URL;
+  private readonly refreshToken:string = process.env.REFRESH_TOKEN;
 
   /**
    *
@@ -89,6 +87,11 @@ export class UploadController {
         body: fs.createReadStream(file.path),
       },
     }, async (err, response) => {
+      if (err) {
+        res.json({
+          error: err
+        })
+      }
       await unlinkAsync(file.path);
       res.json({
         data: {

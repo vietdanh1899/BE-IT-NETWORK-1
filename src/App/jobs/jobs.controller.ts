@@ -347,7 +347,7 @@ export class JobsController extends BaseController<Job> {
       } else {
         throw new HttpException(
           {
-            message: 'Internal Server Error',
+            message: 'The current role is unavailable',
             status: HttpStatus.BAD_REQUEST,
           },
           HttpStatus.BAD_REQUEST,
