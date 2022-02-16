@@ -23,26 +23,26 @@ import grpc
 from content_base import ContentBase
 import rs_pb2
 import rs_pb2_grpc
-import urllib
+
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 class RecommendationServicer(rs_pb2_grpc.RecommendationServicer):
     """Provides methods that implement functionality of route guide server."""
     def __init__(self):
         self.server = os.getenv('SERVER')
-        self.username = os.getenv('USER_NAME')
+        self.user = os.getenv('USER')
         self.password = os.getenv('PASSWORD')
         self.port = os.getenv('PORT')
         self.database = os.getenv('DATABASE_NAME')
-        print('server', self.server)
-        print('user', self.username)
-        print('password', self.password)
-        print('port', self.port)
-        print('database', self.database)
-
         InitDb(self)
+        print('server', self.server)
+        print('server', self.user)
+        print('server', self.password)
+        print('server', self.port)
+        print('server', self.database)
 
 
     def TrackChange(self, request, context):
@@ -91,14 +91,9 @@ def mapData(item, l_tags):
       return np.asarray(i_map)
 
 def InitDb(self):
-    params = urllib.parse.quote_plus("DRIVER=ODBC+Driver+17+for+SQL+Server;"
-                                     "SERVER="+self.server+";"
-                                     "DATABASE="+self.database+";"
-                                     "UID="+self.username+";"
-                                     "PWD="+self.password)
-    engine = create_engine("mssql+pyodbc:///?odbc_connect={}".format(params))
-
-    with engine.connect() as connection:
+    #engine = create_engine(f"mssql+pyodbc://{self.user}:{self.password}@{self.server}:{self.port}/{self.database}?driver=ODBC+Driver+17+for+SQL+Server")
+    
+with engine.connect() as connection:
         result = connection.execute(text("SELECT jobs.id, tags.name  FROM dbo.jobs inner join job_tag on jobs.id = job_tag.jobId inner join tags on tags.id = job_tag.tagId"))
         test = [{column: value for column, value in rowproxy.items()} for rowproxy in result] #Return List of Dict
         res = {}
