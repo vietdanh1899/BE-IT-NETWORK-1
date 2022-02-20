@@ -62,9 +62,9 @@ export class AuthServices {
   }
 
   async getProfile(id: string) {
-    const user = await this.userRepository.find({
+    const user = await this.userRepository.findOne({
       where: { id },
-      relations: ['profile', 'address'],
+      relations: ['profile', 'address', 'profile.cvs'],
       select: [
         'email',
         'id',

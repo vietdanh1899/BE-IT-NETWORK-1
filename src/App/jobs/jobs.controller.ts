@@ -710,16 +710,15 @@ export class JobsController extends BaseController<Job> {
   @ApiBearerAuth()
   @Post('/deny')
   async denyCandidate(@Query('cvId') cvId: string, @Query('jobId') jobId: string) {
-    console.log(cvId);
-    console.log(jobId);
-    console.log('co zo day');
     const jtc = await getRepository(JobToCv).findOne({ where: { cvId: cvId, jobId: jobId }, relations: ["cv", "cv.profile", "cv.profile.user", "job"] });
-    console.log(jtc);
     if (!jtc) return "not found";
     await getManager().query(
       `UPDATE "job_to_cv" set "isDenied" = 'true', "status"= 'false' WHERE "jobToCvId"='${jtc.jobToCvId}'`
     );
-
+    
+    await getManager().query(
+      `UPDATE "applied_job" set "isDenied" = 'true', "status" = 'false' WHERE "jobId"='${jobId}'`
+    )
     const sendTitle = 'Your CV has been reviewed and denied by the recruitment';
     const sendBody = `Unfortunately, your CV has been denied by the recruitment for ${jtc.job.name}. Contact them to get more details!`;
     this.service.sendAppNotification(jtc.cv.profile.user.id, {

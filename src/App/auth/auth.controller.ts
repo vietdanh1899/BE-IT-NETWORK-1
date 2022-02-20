@@ -7,6 +7,7 @@ import {
   Put,
   UseGuards,
   Patch,
+  Param,
 } from '@nestjs/common';
 import { AuthServices } from './auth.service';
 import {
@@ -80,6 +81,13 @@ export class AuthController {
   async getProfile(@UserSession() user: any) {
     
     const { id } = user.users;
+    return await this.authService.getProfile(id);
+  }
+
+  @Get('applicant/:id')
+  @Methods(methodEnum.READ)
+  @UseGuards(PossessionGuard)
+  async getApplicantProfile(@Param('id') id: string, @UserSession() user: any) {
     return await this.authService.getProfile(id);
   }
 
