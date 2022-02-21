@@ -85,6 +85,28 @@ export class EmployersDTO {
   phone: string;
 }
 
+export class EmployerUpdateDTO {
+  @ApiProperty({ example: 'Company Name' })
+  name: string;
+
+  @ApiProperty()
+  city: number;
+
+  @ApiProperty({ example: '032248798' })
+  phone: string;
+
+  @ApiProperty()
+  avatarUrl: string;
+
+  @ApiProperty()
+  street: string;
+
+  @ApiProperty()
+  latitude: number;
+
+  @ApiProperty()
+  longitude: number;
+}
 export class ChangePwdDTO {
   @ApiProperty({
     example: '12345678',

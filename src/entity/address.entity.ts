@@ -5,6 +5,7 @@ import {
   ManyToMany,
   JoinTable,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { Base } from './base.entity';
 import { CrudValidationGroups } from '@nestjsx/crud';
@@ -13,6 +14,7 @@ import { IsOptional, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { User } from './user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Job } from './job.entity';
+import { UserAddress } from './user_address.entity';
 @Entity('addresses')
 export class Address extends Base {
   @PrimaryGeneratedColumn('uuid')
@@ -42,16 +44,17 @@ export class Address extends Base {
   /**
    * The relationship between Address and User
    */
-  @ManyToMany(
-    type => User,
-    user => user.address,
+   @OneToMany(
+    type => UserAddress,
+    userAdress => userAdress.address,
   )
-  user: User[];
+  user: UserAddress[];
 
+  
   /**
    * The relationship between Address and Job
    */
-  @OneToMany(
+   @OneToMany(
     type => Job,
     job => job.address,
     { cascade: true },

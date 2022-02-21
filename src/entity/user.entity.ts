@@ -37,6 +37,7 @@ import RoleId from 'src/types/RoleId';
 import { JobRecently } from './job_recently.entity';
 import { JobFavorite } from './job_favorite.entity';
 import { AppToken } from './app_token.entity';
+import { UserAddress } from './user_address.entity';
 const { CREATE, UPDATE } = CrudValidationGroups;
 
 @Entity('users')
@@ -117,22 +118,11 @@ export class User extends Base {
   /**
    * The relation between User and adress
    */
-  @ManyToMany(
-    type => Address,
-    address => address.user,
+   @OneToMany(
+    type => UserAddress,
+    userAdress => userAdress.user,
   )
-  @JoinTable({
-    name: 'user_address',
-    joinColumn: {
-      name: 'userId',
-      referencedColumnName: 'id',
-    },
-    inverseJoinColumn: {
-      name: 'addressId',
-      referencedColumnName: 'id',
-    },
-  })
-  address: Address[];
+  address: UserAddress[];
 
   /**
    * The relation between User and category

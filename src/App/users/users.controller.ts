@@ -13,6 +13,7 @@ import {
   BadRequestException,
   Post,
   Body,
+  UseGuards,
 } from '@nestjs/common';
 import {
   CrudRequest,
@@ -27,7 +28,7 @@ import { User } from '../../entity/user.entity';
 import { UserService } from './users.service';
 import { UserRepository } from './user.repository';
 import { BaseController } from 'src/common/Base/base.controller';
-import { Not, IsNull, Repository } from 'typeorm';
+import { Not, IsNull, Repository, getManager, getRepository } from 'typeorm';
 import { Modules } from 'src/common/decorators/module.decorator';
 import { Methods } from 'src/common/decorators/method.decorator';
 import { ValidationPipe } from 'src/shared/validation.pipe';
@@ -35,6 +36,7 @@ import {
   ApiOkResponse,
   ApiUnauthorizedResponse,
   ApiTags,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { methodEnum } from 'src/common/enums/method.enum';
 import { ModuleEnum } from 'src/common/enums/module.enum';
@@ -45,8 +47,13 @@ import { UserDTO } from './user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Profile } from 'src/entity/profile.entity';
 import RoleId from 'src/types/RoleId';
-import { EmployersDTO, RegisterDTO } from '../auth/auth.dto';
+import { EmployersDTO, EmployerUpdateDTO, RegisterDTO } from '../auth/auth.dto';
 import { AuthServices } from '../auth/auth.service';
+import { UserSession } from 'src/common/decorators/user.decorator';
+import { PossessionGuard } from 'src/guards/posessionHandle.guard';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { Address } from 'src/entity/address.entity';
+import { UserAddress } from 'src/entity/user_address.entity';
 
 @Crud({
   model: {
@@ -167,6 +174,66 @@ export class UserController extends BaseController<User> {
       }
     }
   }
+
+  @Put('employer/profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async updateEmployerProfile(@Body() data: EmployerUpdateDTO, @UserSession() user : any) {
+    const { id } = user.users;
+    try {
+      const user:User = await this.repository.findOne({
+        where: { id },
+        relations: ['profile', 'address'],
+        select: [
+          'email',
+          'id',
+          'role',
+          'roleId',
+          'createdat',
+          'updatedat',
+          'profile',
+        ],
+      });
+      console.log('--id', id);
+      user.profile.name = data.name
+      user.profile.phone = data.phone;
+      user.profile.profileUrl = data.avatarUrl;
+
+      if (user.address.length > 0) {
+      const addressEntries = await getRepository(Address).findOne({where: {id: user.address[0].addressId}});
+       addressEntries.city = data.city;
+       addressEntries.description = data.street;
+       addressEntries.latitude = data.latitude;
+       addressEntries.longitude = data.longitude;
+       await getRepository(Address).save(addressEntries);
+      } else {
+        console.log('---> log entry');
+        
+        const addressEntries = new Address();
+        addressEntries.city = data.city;
+        addressEntries.description = data.street;
+        addressEntries.latitude = data.latitude;
+        addressEntries.longitude = data.longitude;
+        const savedEntries =  await getRepository(Address).save(addressEntries);
+        console.log('--->userId', user.id);
+        console.log('--->addressId', savedEntries.id);
+        const userAddress = new UserAddress();
+        userAddress.addressId = savedEntries.id;
+        userAddress.userId = user.id;
+        await getManager().save(userAddress)
+      }
+      await getManager().save(user);
+     return {
+       status: true
+     }
+
+    } catch (error) {
+      console.log('--->er', error);
+      
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
 
   @Override('replaceOneBase')
   @Methods(methodEnum.UPDATE)
@@ -483,6 +550,7 @@ export class UserController extends BaseController<User> {
   async Register(@Body() data: RegisterDTO) {
     return this.authService.register(data);
   }
+
 
   @Post('registerContributor')
   @UsePipes(new ValidationPipe())

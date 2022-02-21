@@ -76,7 +76,7 @@ export default class CompanySeeder implements Seeder {
           });
           const manager = getManager();
           await manager.query(
-            `INSERT INTO user_address values ('${findCompany.id}', '${findAddress.id}')`,
+            `INSERT INTO user_address(userId, addressId) values ('${findCompany.id}', '${findAddress.id}')`,
           );
         }
       }
