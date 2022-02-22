@@ -48,6 +48,9 @@ import { clientService } from 'src/grpc/route.service';
 import { UserRequest } from 'models/rs_pb';
 import { CreateJobDTO } from './createJob.dto';
 import { Tag } from '../tags/entities/tag.entity';
+import { AppliedJob } from 'src/entity/applied_job.entity';
+import { ApplicantFavorite } from 'src/entity/applicant_favorite.entity';
+import { ShortListDTO } from './shortList.dto';
 
 @Crud({
   model: {
@@ -164,6 +167,49 @@ export class JobsController extends BaseController<Job> {
       return response
     } catch (error) {
       throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  @Get('jobs/count')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async getTotalApplicantsByEmployer(@UserSession() user : any) {
+    const { id } = user.users;
+    return await getManager().query(`SELECT count(id) as countObj from dbo.jobs where userId = '${id}'`);
+  }
+
+  @Post('/applicants/shortlist')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async updateShortListCandidates(@UserSession() user : any, shortList: ShortListDTO) {
+    const { id } = user.users;
+    await getRepository(ApplicantFavorite).insert({employerId: id, jobId: shortList.jobId, applicantId: shortList.applicantId});
+
+    return {
+      status: true
+    };
+  }
+  
+  @Delete('/shortList/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async deleteShortListCandidates(@UserSession() user : any, @Param('id') id: string) {
+    const { id: userId } = user.users;
+    await getRepository(ApplicantFavorite).delete({id, employerId: userId});
+    
+    return {
+      status: true
+    };
+  }
+
+  @Get('applicants/count') 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async getTotalJobByEmployer(@UserSession() user : any) {
+    const { id } = user.users;
+    const countObj = await getRepository(AppliedJob).count({where: {userId: id}});
+    return {
+      countObj
     }
   }
 
