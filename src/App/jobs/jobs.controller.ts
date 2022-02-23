@@ -175,22 +175,51 @@ export class JobsController extends BaseController<Job> {
   @ApiBearerAuth()
   async getTotalApplicantsByEmployer(@UserSession() user : any) {
     const { id } = user.users;
-    return await getManager().query(`SELECT count(id) as countObj from dbo.jobs where userId = '${id}'`);
+    var countObj = await getManager().query(`SELECT count(id) as countObj from dbo.jobs where userId = '${id}'`);
+    return countObj[0];
   }
 
   @Post('/applicants/shortlist')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async updateShortListCandidates(@UserSession() user : any, shortList: ShortListDTO) {
+  async updateShortListCandidates(@UserSession() user : any,@Body() shortList: ShortListDTO) {
     const { id } = user.users;
+    console.log('--->short', shortList);
+    console.log('-->userId', id);
+    
     await getRepository(ApplicantFavorite).insert({employerId: id, jobId: shortList.jobId, applicantId: shortList.applicantId});
-
     return {
       status: true
     };
   }
   
-  @Delete('/shortList/:id')
+  @Get('applicants/shortlist')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async getShortListCandidates(@UserSession() user: any) {
+    const { id } = user.users;
+    const applicantIds = await getRepository(ApplicantFavorite).find({where: {employerId: id}, select: ['applicantId']});
+    let listIds = [];
+    applicantIds.map(x => listIds.push(x.applicantId));
+    
+    const userEntries = await this.userRepository.find({
+      where: { id: In(listIds) },
+      relations: ['profile', 'address', 'address.address', 'profile.cvs'],
+      select: [
+        'email',
+        'id',
+        'role',
+        'roleId',
+        'createdat',
+        'updatedat',
+        'profile',
+      ],
+    });
+
+    return userEntries;
+  }
+
+  @Delete('/applicants/shortList/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async deleteShortListCandidates(@UserSession() user : any, @Param('id') id: string) {

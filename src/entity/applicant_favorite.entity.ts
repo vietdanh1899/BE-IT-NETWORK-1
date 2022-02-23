@@ -6,12 +6,12 @@ export class ApplicantFavorite extends Base {
 @PrimaryGeneratedColumn('uuid')
 id: string
 
-@Column({type: 'uuid'})
+@Column()
 employerId: string;
 
-@Column({type: 'uuid'})
+@Column()
 applicantId: string;
 
-@Column({type: 'uuid'})
+@Column()
 jobId: string;
 }
