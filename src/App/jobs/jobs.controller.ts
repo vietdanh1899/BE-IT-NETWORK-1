@@ -364,8 +364,8 @@ export class JobsController extends BaseController<Job> {
       const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-          user: 'vietdanh.kiemtien.01@gmail.com', // generated ethereal user
-          pass: 'kiemtien01', // generated ethereal password
+          user: 'fiddler.test2@gmail.com', // generated ethereal user
+          pass: 'skynet.skyfall', // generated ethereal password
         },
       });
 
