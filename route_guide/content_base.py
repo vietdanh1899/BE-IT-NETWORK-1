@@ -16,14 +16,12 @@ class ContentBase:
 
     @staticmethod
     def get_items_rated_by_user(rate_matrix, user_id):
-        print('user id', user_id);
-        print('rate_matrix', rate_matrix);
-        print('type', type(rate_matrix))
         if (rate_matrix.size == 0):
             return ([], [])
         y = rate_matrix[:, 0]
         ids = np.where(y == user_id)
         item_ids = rate_matrix[ids, 1];
+
         scores = rate_matrix[ids, 2]
         return item_ids, scores
 
@@ -38,14 +36,16 @@ class ContentBase:
             i = np.where(n_users == n[0])[0][0]
             ids, scores = self.get_items_rated_by_user(rate_train, n[0])
             clf = Ridge(alpha=0.01, fit_intercept=True)
+            print('ids', ids.size);
 
-            if not ids == 0:
+            if ids.size == 0:
                 W[:, i] = 0
                 b[0, i] = 0
-                return W, b
+                continue;
 
             tests = self.getIndexInArr(index_arr, ids[0])
             Xhat = tfidf[tests, :]
+
             if Xhat.size != 0:
                 clf.fit(Xhat, scores[0])
                 W[:, i] = clf.coef_

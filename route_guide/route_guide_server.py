@@ -43,6 +43,7 @@ class RecommendationServicer(rs_pb2_grpc.RecommendationServicer):
         print('database', self.database)
 
         yhat, users, data = InitDb(self)
+        print('yhat', yhat)
         self.yhat = yhat
         self.users = users
         self.data = data
@@ -61,7 +62,12 @@ class RecommendationServicer(rs_pb2_grpc.RecommendationServicer):
 
     def GetItemRecommended(self, request, context):
         indexUserId = self.get_Index_user(request.id)
+        print('req userId', request.id);
+        print('index', indexUserId);
+        print('req userId', request.id);
+        print('yhat', self.yhat);
         itemIdsRated = self.yhat[:, indexUserId]
+        print('item id rated', itemIdsRated)
         output = np.asarray([idx for idx, element in enumerate(itemIdsRated) if (element > 0)])
         print('output 1', output)
 
@@ -130,6 +136,8 @@ def InitDb(self):
     W, b = ContentBase.GetRidgeRegression(self=ContentBase, n_users=np.asarray(users), rate_train=rate_train,
                                           tfidf=tfidf, W=W, b=b, index_arr=a[:, 0])
     Yhat = tfidf.dot(W) + b
+    with open('out.txt', 'w') as f:
+        print('Filename:', Yhat, file=f)  # Python 3.x
     return Yhat, users, a
 def getUserRatingMatrix(engine):
     with engine.connect() as connection:
