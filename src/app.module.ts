@@ -20,6 +20,7 @@ import { ApplyController } from './App/apply/apply.controller';
 import { UploadModule } from './App/upload/upload/upload.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TagsModule } from './App/tags/tags.module';
+import { NotificationModule } from './App/notification/notification.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { TagsModule } from './App/tags/tags.module';
     AddressModule,
     TagsModule,
     JobsModule,
+    NotificationModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useClass: TypeOrmConfigService,

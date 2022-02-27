@@ -28,7 +28,6 @@ import { Exclude, Type } from 'class-transformer';
 import { CrudValidationGroups } from '@nestjsx/crud';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '../entity/role.entity';
-import { Address } from './address.entity';
 import { Profile } from './profile.entity';
 import { Category } from './category.entity';
 import { Job } from './job.entity';
@@ -38,6 +37,7 @@ import { JobRecently } from './job_recently.entity';
 import { JobFavorite } from './job_favorite.entity';
 import { AppToken } from './app_token.entity';
 import { UserAddress } from './user_address.entity';
+import { Notification } from './notification.entity';
 const { CREATE, UPDATE } = CrudValidationGroups;
 
 @Entity('users')
@@ -143,6 +143,13 @@ export class User extends Base {
     { cascade: true },
   )
   jobs: Job[];
+
+
+  @OneToMany(
+    type => Notification,
+    notification => notification.user,
+  )
+  notifications: Notification[];
 
   /**
    * A user can apply many jobs

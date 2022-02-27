@@ -9,6 +9,7 @@ import { Address } from 'src/entity/address.entity';
 import { JobRepository } from './jobs.repository';
 import { AppliedJob } from 'src/entity/applied_job.entity';
 import { AppliesJobRepo } from './jobApplies.repository';
+import { NotificationRepository } from '../notification/notification.repository';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AppliesJobRepo } from './jobApplies.repository';
       JobRepository,
       AppliedJob,
       AppliesJobRepo,
+      NotificationRepository
     ]),
   ],
   providers: [JobService],

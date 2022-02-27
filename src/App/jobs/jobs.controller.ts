@@ -343,48 +343,45 @@ export class JobsController extends BaseController<Job> {
     @UserSession() user: any,
   ) {
     try {
-      // console.log('jere');
-      // return;
-      const job = await this.repository.findOne({ id: id });
-      const acceptedUser = await this.userRepository.findOne({
-        id: jobDTO.userId,
-      });
-      // return acceptedUser;
-      console.log('da goi accept');
-      await this.service.acceptJob(jobDTO.userId, id, user.users.id);
+      console.log('--->test');
+      
+      // const job = await this.repository.findOne({ id: id });
+      // const acceptedUser = await this.userRepository.findOne({
+      //   id: jobDTO.userId,
+      // });
+      // await this.service.acceptJob(jobDTO.userId, id, user.users.id);
 
-      const sendTitle = 'Your CV has been reviewed and accepted by the recruitment';
-      const sendBody = `Congratulation, your CV has been accepted by the recruitment for ${job.name}. Contact them to get more details!`;
-      this.service.sendAppNotification(acceptedUser.id, {
-        notification: {
-          title: sendTitle,
-          body: sendBody
-        }
-      })
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: 'fiddler.test2@gmail.com', // generated ethereal user
-          pass: 'skynet.skyfall', // generated ethereal password
-        },
-      });
+      // const sendTitle = 'Your CV has been reviewed and accepted by the recruitment';
+      // const sendBody = `Congratulation, your CV has been accepted by the recruitment for ${job.name}. Contact them to get more details!`;
 
-      // send mail with defined transport object
-      const mailOptions = {
-        from: '"Career Network" <vietdanh.kiemtien.01@gmail.com>', // sender address
-        to: acceptedUser.email, // list of receivers
-        subject: sendTitle, // Subject line
-        text: sendBody, // plain text body
-        // html: `<a>Here's your password for login as employee</b><p>Make sure you don't share this email public</p><b>password: ${generatePassword}</b><p>Our best</p><b>Twist Team</b>`, // html body
-      };
-
-      transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
+      await this.service.addNotification({title: 'Your CV has been reviewed and accepted by the recruitment', 
+      content: `Congratulation, your CV has been accepted by the recruitment for ${jobDTO.userId}. Contact them to get more details!`,
+      userId: jobDTO.userId
       });
+      
+      // const transporter = nodemailer.createTransport({
+      //   service: 'gmail',
+      //   auth: {
+      //     user: 'fiddler.test2@gmail.com', // generated ethereal user
+      //     pass: 'skynet.skyfall', // generated ethereal password
+      //   },
+      // });
+      
+      // // send mail with defined transport object
+      // const mailOptions = {
+      //   from: '"Career Network" <vietdanh.kiemtien.01@gmail.com>', // sender address
+      //   to: acceptedUser.email, // list of receivers
+      //   subject: sendTitle, // Subject line
+      //   text: sendBody, // plain text body
+      // };
+
+      // transporter.sendMail(mailOptions, function (error, info) {
+      //   if (error) {
+      //     console.log(error);
+      //   } else {
+      //     console.log('Email sent: ' + info.response);
+      //   }
+      // });
     } catch (err) {
       return {
         status: false,

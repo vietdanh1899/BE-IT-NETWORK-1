@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import * as admin from 'firebase-admin'
-import * as firebaseConfig from 'firebase-credentials.json'
+import * as firebaseConfig from 'itnetwork.json'
 
 // eslint-disable-next-line @typescript-eslint/camelcase
 const firebase_params = {

@@ -106,10 +106,12 @@ export class AuthController {
   async registerAppToken(@UserSession() user, @Body('appToken') appToken: string) {
     const userId: string = user.users.id;
     const foundUser = await getRepository(User).findOne(userId);
+
+    await getManager().query(`DELETE FROM [dbo].[appToken] where userId = '${userId}'`);
     const aToken = new AppToken();
-    aToken.token = appToken;
-    aToken.user = foundUser;
-    const res = await getManager().save(aToken);
-    return res;
+      aToken.token = appToken;
+      aToken.user = foundUser;
+      const res = await getManager().save(aToken);
+      return res;
   }
 }

@@ -31,6 +31,8 @@ import { MessagingPayload } from 'firebase-admin/lib/messaging/messaging-api';
 import * as admin from 'firebase-admin';
 import { Tag } from '../tags/entities/tag.entity';
 import { CreateJobDTO } from './createJob.dto';
+import { NotificationDTO } from '../notification/notification.dto';
+import { NotificationRepository } from '../notification/notification.repository';
 @Injectable()
 export class JobService extends TypeOrmCrudService<Job> {
   private tableName = 'job_favorite ';
@@ -44,6 +46,7 @@ export class JobService extends TypeOrmCrudService<Job> {
     private readonly cateRepository: CategoryRepository,
     private readonly addressRepository: AddressRepository,
     private readonly appliesJobRepo: AppliesJobRepo,
+    private readonly notificationRepo: NotificationRepository
   ) {
     super(repo);
   }
@@ -461,5 +464,12 @@ export class JobService extends TypeOrmCrudService<Job> {
       return admin.messaging().sendToDevice(foundUser.appTokens.map((at) => at.token), payload);
     }
     return 'No User or Token Valid';
+  }
+
+  async addNotification(payload: NotificationDTO) {
+    const foundUser = await getRepository(User).findOne(payload.userId, { relations: ['appTokens'] });
+    console.log('-->found user', foundUser);
+    
+    this.notificationRepo.addNewNotification(payload, foundUser.appTokens.map((at) => at.token));
   }
 }
