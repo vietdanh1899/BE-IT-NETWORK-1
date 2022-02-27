@@ -42,7 +42,10 @@ class RecommendationServicer(rs_pb2_grpc.RecommendationServicer):
         print('port', self.port)
         print('database', self.database)
 
-        InitDb(self)
+        yhat, users, data = InitDb(self)
+        self.yhat = yhat
+        self.users = users
+        self.data = data
 
 
     def TrackChange(self, request, context):

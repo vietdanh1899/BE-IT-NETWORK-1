@@ -345,43 +345,50 @@ export class JobsController extends BaseController<Job> {
     try {
       console.log('--->test');
       
-      // const job = await this.repository.findOne({ id: id });
-      // const acceptedUser = await this.userRepository.findOne({
-      //   id: jobDTO.userId,
-      // });
-      // await this.service.acceptJob(jobDTO.userId, id, user.users.id);
+      const job = await this.repository.findOne({ id: id });
+      const acceptedUser = await this.userRepository.findOne({
+        id: jobDTO.userId,
+      });
+      
+      const recruiter = await this.userRepository.findOne({
+        id: user.users.id
+      }, {
+        relations: ['profile']
+      });
 
-      // const sendTitle = 'Your CV has been reviewed and accepted by the recruitment';
-      // const sendBody = `Congratulation, your CV has been accepted by the recruitment for ${job.name}. Contact them to get more details!`;
+      await this.service.acceptJob(jobDTO.userId, id, user.users.id);
 
-      await this.service.addNotification({title: 'Your CV has been reviewed and accepted by the recruitment', 
-      content: `Congratulation, your CV has been accepted by the recruitment for ${jobDTO.userId}. Contact them to get more details!`,
+      const sendTitle = 'Your CV has been reviewed and accepted by the recruitment';
+      const sendBody = `Congratulation, your CV has been accepted by the recruitment for ${job.name} at ${recruiter.profile.name}. Contact them to get more details!`;
+
+      await this.service.addNotification({title: sendTitle, 
+      content: sendBody,
       userId: jobDTO.userId
       });
       
-      // const transporter = nodemailer.createTransport({
-      //   service: 'gmail',
-      //   auth: {
-      //     user: 'fiddler.test2@gmail.com', // generated ethereal user
-      //     pass: 'skynet.skyfall', // generated ethereal password
-      //   },
-      // });
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'fidler.test2@gmail.com', // generated ethereal user
+          pass: 'skynet.skyfall', // generated ethereal password
+        },
+      });
       
       // // send mail with defined transport object
-      // const mailOptions = {
-      //   from: '"Career Network" <vietdanh.kiemtien.01@gmail.com>', // sender address
-      //   to: acceptedUser.email, // list of receivers
-      //   subject: sendTitle, // Subject line
-      //   text: sendBody, // plain text body
-      // };
+      const mailOptions = {
+        from: '"Career Network" <vietdanh.kiemtien.01@gmail.com>', // sender address
+        to: acceptedUser.email, // list of receivers
+        subject: sendTitle, // Subject line
+        text: sendBody, // plain text body
+      };
 
-      // transporter.sendMail(mailOptions, function (error, info) {
-      //   if (error) {
-      //     console.log(error);
-      //   } else {
-      //     console.log('Email sent: ' + info.response);
-      //   }
-      // });
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
     } catch (err) {
       return {
         status: false,
