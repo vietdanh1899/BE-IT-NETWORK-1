@@ -11,7 +11,7 @@ export class NotificationRepository extends BaseRepository<Notification> {
     /**
      *
      */
-    async addNewNotification(payload: NotificationDTO, appTokens: Array<string>) {
+    async addNewNotification(payload: NotificationDTO, appTokens: string) {
         console.log('--->applied');
         const registrationToken = 'dPRe8mMXRUyipjwHEY1toi:APA91bEi3EFHAOfeZRBTaucB0bHTxpw5lIxanGrtGiqO4O0Kp4ilaYMV2Yw5LQWtee61JHKOKD0Nvm4D5eoHrs6CHTpkSAxcieNMTvgv_2-mAxNw0G0h9dMNeoL4LLFQAXH8SVrsLMyD';
 

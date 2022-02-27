@@ -4,7 +4,7 @@ import { UserSession } from 'src/common/decorators/user.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { NotificationService } from './notification.service';
 
-@Controller('notification')
+@Controller('api/v1/notification')
 export class NotificationController {
 
     constructor(

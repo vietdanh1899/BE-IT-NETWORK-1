@@ -467,9 +467,8 @@ export class JobService extends TypeOrmCrudService<Job> {
   }
 
   async addNotification(payload: NotificationDTO) {
-    const foundUser = await getRepository(User).findOne(payload.userId, { relations: ['appTokens'] });
-    console.log('-->found user', foundUser);
+    const token = await getManager().query(`SELECT TOP 1 token from [dbo].[appToken] where userId = '${payload.userId}'`);
     
-    this.notificationRepo.addNewNotification(payload, foundUser.appTokens.map((at) => at.token));
+    this.notificationRepo.addNewNotification(payload, token[0].token);
   }
 }
