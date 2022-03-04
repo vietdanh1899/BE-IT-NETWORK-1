@@ -68,7 +68,7 @@ class RecommendationServicer(rs_pb2_grpc.RecommendationServicer):
         print('yhat', self.yhat);
         itemIdsRated = self.yhat[:, indexUserId]
         print('item id rated', itemIdsRated)
-        output = np.asarray([idx for idx, element in enumerate(itemIdsRated) if (element > 0)])
+        output = np.asarray([idx for idx, element in enumerate(itemIdsRated) if (element > 2.5)])
         print('output 1', output)
 
         if output.size == 0:
