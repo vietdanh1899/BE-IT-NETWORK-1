@@ -837,7 +837,7 @@ export class JobsController extends BaseController<Job> {
   @Get('/search/autocomplete')
   async searchJobAutocomplete(@Query('s') s: string) {
     const res = await getManager().query(
-      `SELECT TOP 5 name, id from dbo.jobs WHERE name LIKE '%${s}%'`
+      `SELECT TOP 5 name, id from dbo.jobs WHERE name LIKE '%${s}%' and status=1`
     )
     return res;
   }
