@@ -6,6 +6,26 @@
 
 import * as jspb from "google-protobuf";
 
+export class ItemRequest extends jspb.Message { 
+    getId(): string;
+    setId(value: string): ItemRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): ItemRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: ItemRequest): ItemRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: ItemRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): ItemRequest;
+    static deserializeBinaryFromReader(message: ItemRequest, reader: jspb.BinaryReader): ItemRequest;
+}
+
+export namespace ItemRequest {
+    export type AsObject = {
+        id: string,
+    }
+}
+
 export class UserRequest extends jspb.Message { 
     getId(): string;
     setId(value: string): UserRequest;

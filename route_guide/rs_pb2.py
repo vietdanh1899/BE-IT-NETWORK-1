@@ -19,10 +19,42 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x08rs.proto\x12\x0eRecommendation\"\x19\n\x0bUserRequest\x12\n\n\x02id\x18\x01 \x01(\t\"\x1f\n\x0cItemResponse\x12\x0f\n\x07itemIds\x18\x01 \x03(\t\"\x18\n\x05\x43heck\x12\x0f\n\x07message\x18\x01 \x01(\t2\xa2\x01\n\x0eRecommendation\x12Q\n\x12GetItemRecommended\x12\x1b.Recommendation.UserRequest\x1a\x1c.Recommendation.ItemResponse\"\x00\x12=\n\x0bTrackChange\x12\x15.Recommendation.Check\x1a\x15.Recommendation.Check\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x08rs.proto\x12\x0eRecommendation\"\x19\n\x0bItemRequest\x12\n\n\x02id\x18\x01 \x01(\t\"\x19\n\x0bUserRequest\x12\n\n\x02id\x18\x01 \x01(\t\"\x1f\n\x0cItemResponse\x12\x0f\n\x07itemIds\x18\x01 \x03(\t\"\x18\n\x05\x43heck\x12\x0f\n\x07message\x18\x01 \x01(\t2\xf1\x01\n\x0eRecommendation\x12Q\n\x12GetItemRecommended\x12\x1b.Recommendation.UserRequest\x1a\x1c.Recommendation.ItemResponse\"\x00\x12M\n\x0eGetSimilarItem\x12\x1b.Recommendation.ItemRequest\x1a\x1c.Recommendation.ItemResponse\"\x00\x12=\n\x0bTrackChange\x12\x15.Recommendation.Check\x1a\x15.Recommendation.Check\"\x00\x62\x06proto3'
 )
 
 
+
+
+_ITEMREQUEST = _descriptor.Descriptor(
+  name='ItemRequest',
+  full_name='Recommendation.ItemRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='Recommendation.ItemRequest.id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=28,
+  serialized_end=53,
+)
 
 
 _USERREQUEST = _descriptor.Descriptor(
@@ -52,8 +84,8 @@ _USERREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=28,
-  serialized_end=53,
+  serialized_start=55,
+  serialized_end=80,
 )
 
 
@@ -84,8 +116,8 @@ _ITEMRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=55,
-  serialized_end=86,
+  serialized_start=82,
+  serialized_end=113,
 )
 
 
@@ -116,14 +148,22 @@ _CHECK = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=88,
-  serialized_end=112,
+  serialized_start=115,
+  serialized_end=139,
 )
 
+DESCRIPTOR.message_types_by_name['ItemRequest'] = _ITEMREQUEST
 DESCRIPTOR.message_types_by_name['UserRequest'] = _USERREQUEST
 DESCRIPTOR.message_types_by_name['ItemResponse'] = _ITEMRESPONSE
 DESCRIPTOR.message_types_by_name['Check'] = _CHECK
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
+
+ItemRequest = _reflection.GeneratedProtocolMessageType('ItemRequest', (_message.Message,), {
+  'DESCRIPTOR' : _ITEMREQUEST,
+  '__module__' : 'rs_pb2'
+  # @@protoc_insertion_point(class_scope:Recommendation.ItemRequest)
+  })
+_sym_db.RegisterMessage(ItemRequest)
 
 UserRequest = _reflection.GeneratedProtocolMessageType('UserRequest', (_message.Message,), {
   'DESCRIPTOR' : _USERREQUEST,
@@ -155,8 +195,8 @@ _RECOMMENDATION = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=115,
-  serialized_end=277,
+  serialized_start=142,
+  serialized_end=383,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetItemRecommended',
@@ -169,9 +209,19 @@ _RECOMMENDATION = _descriptor.ServiceDescriptor(
     create_key=_descriptor._internal_create_key,
   ),
   _descriptor.MethodDescriptor(
+    name='GetSimilarItem',
+    full_name='Recommendation.Recommendation.GetSimilarItem',
+    index=1,
+    containing_service=None,
+    input_type=_ITEMREQUEST,
+    output_type=_ITEMRESPONSE,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
     name='TrackChange',
     full_name='Recommendation.Recommendation.TrackChange',
-    index=1,
+    index=2,
     containing_service=None,
     input_type=_CHECK,
     output_type=_CHECK,

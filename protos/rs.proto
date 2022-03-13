@@ -4,9 +4,13 @@ package Recommendation;
 
 service Recommendation {
     rpc GetItemRecommended(UserRequest) returns (ItemResponse) {};
+    rpc GetSimilarItem(ItemRequest) returns (ItemResponse) {};
     rpc TrackChange(Check) returns (Check) {};
 }
 
+message ItemRequest {
+    string id = 1;
+}
 
 //the message contain userId request
 message UserRequest {

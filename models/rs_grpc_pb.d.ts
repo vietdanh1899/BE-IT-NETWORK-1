@@ -9,6 +9,7 @@ import * as rs_pb from "./rs_pb";
 
 interface IRecommendationService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
     getItemRecommended: IRecommendationService_IGetItemRecommended;
+    getSimilarItem: IRecommendationService_IGetSimilarItem;
     trackChange: IRecommendationService_ITrackChange;
 }
 
@@ -18,6 +19,15 @@ interface IRecommendationService_IGetItemRecommended extends grpc.MethodDefiniti
     responseStream: false;
     requestSerialize: grpc.serialize<rs_pb.UserRequest>;
     requestDeserialize: grpc.deserialize<rs_pb.UserRequest>;
+    responseSerialize: grpc.serialize<rs_pb.ItemResponse>;
+    responseDeserialize: grpc.deserialize<rs_pb.ItemResponse>;
+}
+interface IRecommendationService_IGetSimilarItem extends grpc.MethodDefinition<rs_pb.ItemRequest, rs_pb.ItemResponse> {
+    path: "/Recommendation.Recommendation/GetSimilarItem";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<rs_pb.ItemRequest>;
+    requestDeserialize: grpc.deserialize<rs_pb.ItemRequest>;
     responseSerialize: grpc.serialize<rs_pb.ItemResponse>;
     responseDeserialize: grpc.deserialize<rs_pb.ItemResponse>;
 }
@@ -35,6 +45,7 @@ export const RecommendationService: IRecommendationService;
 
 export interface IRecommendationServer extends grpc.UntypedServiceImplementation {
     getItemRecommended: grpc.handleUnaryCall<rs_pb.UserRequest, rs_pb.ItemResponse>;
+    getSimilarItem: grpc.handleUnaryCall<rs_pb.ItemRequest, rs_pb.ItemResponse>;
     trackChange: grpc.handleUnaryCall<rs_pb.Check, rs_pb.Check>;
 }
 
@@ -42,6 +53,9 @@ export interface IRecommendationClient {
     getItemRecommended(request: rs_pb.UserRequest, callback: (error: grpc.ServiceError | null, response: rs_pb.ItemResponse) => void): grpc.ClientUnaryCall;
     getItemRecommended(request: rs_pb.UserRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: rs_pb.ItemResponse) => void): grpc.ClientUnaryCall;
     getItemRecommended(request: rs_pb.UserRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: rs_pb.ItemResponse) => void): grpc.ClientUnaryCall;
+    getSimilarItem(request: rs_pb.ItemRequest, callback: (error: grpc.ServiceError | null, response: rs_pb.ItemResponse) => void): grpc.ClientUnaryCall;
+    getSimilarItem(request: rs_pb.ItemRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: rs_pb.ItemResponse) => void): grpc.ClientUnaryCall;
+    getSimilarItem(request: rs_pb.ItemRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: rs_pb.ItemResponse) => void): grpc.ClientUnaryCall;
     trackChange(request: rs_pb.Check, callback: (error: grpc.ServiceError | null, response: rs_pb.Check) => void): grpc.ClientUnaryCall;
     trackChange(request: rs_pb.Check, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: rs_pb.Check) => void): grpc.ClientUnaryCall;
     trackChange(request: rs_pb.Check, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: rs_pb.Check) => void): grpc.ClientUnaryCall;
@@ -52,6 +66,9 @@ export class RecommendationClient extends grpc.Client implements IRecommendation
     public getItemRecommended(request: rs_pb.UserRequest, callback: (error: grpc.ServiceError | null, response: rs_pb.ItemResponse) => void): grpc.ClientUnaryCall;
     public getItemRecommended(request: rs_pb.UserRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: rs_pb.ItemResponse) => void): grpc.ClientUnaryCall;
     public getItemRecommended(request: rs_pb.UserRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: rs_pb.ItemResponse) => void): grpc.ClientUnaryCall;
+    public getSimilarItem(request: rs_pb.ItemRequest, callback: (error: grpc.ServiceError | null, response: rs_pb.ItemResponse) => void): grpc.ClientUnaryCall;
+    public getSimilarItem(request: rs_pb.ItemRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: rs_pb.ItemResponse) => void): grpc.ClientUnaryCall;
+    public getSimilarItem(request: rs_pb.ItemRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: rs_pb.ItemResponse) => void): grpc.ClientUnaryCall;
     public trackChange(request: rs_pb.Check, callback: (error: grpc.ServiceError | null, response: rs_pb.Check) => void): grpc.ClientUnaryCall;
     public trackChange(request: rs_pb.Check, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: rs_pb.Check) => void): grpc.ClientUnaryCall;
     public trackChange(request: rs_pb.Check, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: rs_pb.Check) => void): grpc.ClientUnaryCall;

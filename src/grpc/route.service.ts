@@ -1,7 +1,7 @@
 import { credentials, Metadata } from '@grpc/grpc-js';
 import { promisify } from 'util';
 import { RecommendationClient } from 'models/rs_grpc_pb';
-import { Check, ItemResponse, UserRequest} from 'models/rs_pb';
+import { Check, ItemRequest, ItemResponse, UserRequest} from 'models/rs_pb';
 
 class ClientService {
     private readonly client: RecommendationClient = new RecommendationClient('localhost:50051', credentials.createInsecure());
@@ -14,6 +14,11 @@ class ClientService {
       return promisify<Check, Metadata, Check>(this.client.trackChange.bind(this.client))(param, metadata);
     }
 
+    public async getSimilarItem(param: ItemRequest, metadata: Metadata = new Metadata()) : Promise<ItemResponse> {
+      console.log('-->param', param);
+      
+      return promisify<ItemRequest, Metadata, ItemResponse>(this.client.getSimilarItem.bind(this.client))(param, metadata);
+    }
   }
   
   export const clientService: ClientService = new ClientService();

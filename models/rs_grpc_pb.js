@@ -15,6 +15,17 @@ function deserialize_Recommendation_Check(buffer_arg) {
   return rs_pb.Check.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_Recommendation_ItemRequest(arg) {
+  if (!(arg instanceof rs_pb.ItemRequest)) {
+    throw new Error('Expected argument of type Recommendation.ItemRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_Recommendation_ItemRequest(buffer_arg) {
+  return rs_pb.ItemRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_Recommendation_ItemResponse(arg) {
   if (!(arg instanceof rs_pb.ItemResponse)) {
     throw new Error('Expected argument of type Recommendation.ItemResponse');
@@ -47,6 +58,17 @@ var RecommendationService = exports.RecommendationService = {
     responseType: rs_pb.ItemResponse,
     requestSerialize: serialize_Recommendation_UserRequest,
     requestDeserialize: deserialize_Recommendation_UserRequest,
+    responseSerialize: serialize_Recommendation_ItemResponse,
+    responseDeserialize: deserialize_Recommendation_ItemResponse,
+  },
+  getSimilarItem: {
+    path: '/Recommendation.Recommendation/GetSimilarItem',
+    requestStream: false,
+    responseStream: false,
+    requestType: rs_pb.ItemRequest,
+    responseType: rs_pb.ItemResponse,
+    requestSerialize: serialize_Recommendation_ItemRequest,
+    requestDeserialize: deserialize_Recommendation_ItemRequest,
     responseSerialize: serialize_Recommendation_ItemResponse,
     responseDeserialize: deserialize_Recommendation_ItemResponse,
   },

@@ -135,7 +135,7 @@ export class AuthServices {
   }
 
   async addLead(dto: EmployersDTO) {
-    console.log('--->dto', dto);
+    console.log('--->dto employer', dto);
     
     try {
       const manager = getManager();
@@ -145,6 +145,8 @@ export class AuthServices {
       );
       let query = '(';
 
+      console.log('-->proifile', provinces);
+      
       Object.keys(dto.city).forEach(key => {
         const index = provinces.data.results
           .map(data => data.province_id)
@@ -168,6 +170,8 @@ export class AuthServices {
       const findAddress = await manager.query(
         `SELECT * FROM ${this.addressRepository.metadata.tableName} WHERE id in ${query} `,
       );
+      console.log('-->find', findAddress);
+      
       const data = this.userRepository.create({
         roleId: RoleId.CONTRIBUTOR,
         email: dto.email,
@@ -186,13 +190,10 @@ export class AuthServices {
       const { email, id, role, roleId, profile, createdat, updatedat } = data;
       return { email, id, role, roleId, profile, createdat, updatedat };
     } catch (error) {
-      console.log('-->err', error);
       
       if (error.status == 400) {
         throw error;
       }
-      console.log('-->code', error.code);
-      console.log('-->number', error.number);
       
       if (error.number == 2627) {
         throw new HttpException(

@@ -45,7 +45,7 @@ import { GeoDTO } from './geo.dto';
 import { getDistance } from 'geolib';
 import { JobToCv } from 'src/entity/jobtocv.entity';
 import { clientService } from 'src/grpc/route.service';
-import { UserRequest } from 'models/rs_pb';
+import { ItemRequest, UserRequest } from 'models/rs_pb';
 import { CreateJobDTO } from './createJob.dto';
 import { Tag } from '../tags/entities/tag.entity';
 import { AppliedJob } from 'src/entity/applied_job.entity';
@@ -757,6 +757,21 @@ export class JobsController extends BaseController<Job> {
     } catch (err) {
       throw err;
       //ToDo: get job in normal mode
+    }
+  }
+
+
+  @Get('/rs/similar/:id')
+  async getSimilarItem(@Param('id') id: string) {
+    console.log('-->id', id);
+    try {
+      const requestParam = new ItemRequest();
+      requestParam.setId(id);
+      const itemIds = await clientService.getSimilarItem(requestParam);
+      console.log('ids', itemIds.getItemidsList())
+      return await this.repository.find({where: {id: In(itemIds.getItemidsList())}});
+    } catch(err) {
+      throw err;
     }
   }
 

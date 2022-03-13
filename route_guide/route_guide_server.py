@@ -26,6 +26,7 @@ import rs_pb2_grpc
 import urllib
 import os
 from dotenv import load_dotenv
+from scipy import spatial
 load_dotenv()
 
 class RecommendationServicer(rs_pb2_grpc.RecommendationServicer):
@@ -47,7 +48,6 @@ class RecommendationServicer(rs_pb2_grpc.RecommendationServicer):
         self.yhat = yhat
         self.users = users
         self.data = data
-
 
     def TrackChange(self, request, context):
         print('track change');
@@ -91,6 +91,19 @@ class RecommendationServicer(rs_pb2_grpc.RecommendationServicer):
         indexItemSortedIds = sorted(range(len(sumArr)), key=lambda k : sumArr[k], reverse=True)
         return self.data[:,0][indexItemSortedIds] #return sorted List ids of item by uuid
 
+    def GetSimilarItem(self,  request, context):
+        id = ContentBase.getIndexInArr(self.data[:,0], [request.id]);
+        print('-->id', id)
+        print('self data', self.yhat[id[0]])
+        listItems = []
+        for item in self.yhat:
+            consi = 1 - spatial.distance.cosine(item,  self.yhat[id[0]])
+            listItems.append(consi)
+
+        indexItemSortedIds = sorted(range(len(listItems)), key=lambda k: listItems[k], reverse=True)
+        # print('consi', indexItemSortedIds)
+        return rs_pb2.ItemResponse(
+            itemIds=self.data[:, 0][indexItemSortedIds[:10]])  # return sorted List ids of item by uuid
     def get_Index_user(self, userId):
         ids = np.where(self.users == userId)[0][0]
         return ids
