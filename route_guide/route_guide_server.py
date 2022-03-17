@@ -132,8 +132,9 @@ def InitDb(self):
       data = list(res.items())
       a = np.asarray(list(map((lambda x: mapData(x, l_tag)), data)))
       numberOfItem = len(l_tag)
-      X_train_counts = a[:, -(numberOfItem - 1):]
-
+      X_train_counts = a[:, -(numberOfItem):]
+      print('X_train_cont length', X_train_counts[0].size)
+      print('X_train_counts', X_train_counts[0])
     with engine.connect() as connection:
       users = connection.execute(text("SELECT Id from users"))
       users = pd.DataFrame(users)

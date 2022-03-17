@@ -14,6 +14,7 @@ import { Role } from 'src/entity/role.entity';
 import { UserRepository } from 'src/App/users/user.repository';
 import * as bcrypt from 'bcrypt';
 import * as _ from 'lodash';
+import { clientService } from 'src/grpc/route.service';
 import {
   LoginDTO,
   RegisterDTO,
@@ -29,6 +30,7 @@ import { AddressRepository } from '../address/address.repository';
 import { Profile } from 'src/entity/profile.entity';
 import { Job } from 'src/entity/job.entity';
 import RoleId from 'src/types/RoleId';
+import { Check } from 'models/rs_pb';
 
 @Injectable()
 export class AuthServices {
@@ -119,6 +121,11 @@ export class AuthServices {
         profile: { name: dto.name },
       });
       await this.userRepository.save(data);
+      const requestParam = new Check();
+      requestParam.setMessage('request');
+      
+      clientService.trackChange(requestParam);
+
       return this.login({ password: dto.password, email: dto.email });
     } catch (error) {
       if (error.code == '23505') {
